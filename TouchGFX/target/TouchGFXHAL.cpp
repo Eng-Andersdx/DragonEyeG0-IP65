@@ -24,6 +24,13 @@
 
 /* USER CODE BEGIN TouchGFXHAL.cpp */
 using namespace touchgfx;
+#include <dragoneye_leds.h>
+#include <de_lite_display.h>
+#include "bsp.h"
+#include "touchgfx/hal/OSWrappers.hpp"
+extern TIM_HandleTypeDef htim1;
+static TIM_TypeDef* const LINE_TIMER = TIM17;
+extern volatile uint16_t tearingEffectCount;
 
 /* ******************************************************
  * Functions required by Partial Frame Buffer Strategy
@@ -47,7 +54,21 @@ void TouchGFXHAL::initialize()
     // To overwrite the generated implementation, omit the call to the parent function
     // and implement the needed functionality here.
     // Please note, HAL::initialize() must be called to initialize the framework.
+	BSP_LED_PWM_Init(&htim1, TIM_CHANNEL_4, TIM_CHANNEL_3, TIM_CHANNEL_2);
+	BSP_LED_SetColor(RGB_RED);
+	BSP_BL_PWM_Init(&htim1, TIM_CHANNEL_1);
+	BSP_BL_SetIntensity(100);
+#ifdef DragonEyeG0
+	Display_Reset();
+	DisplayDriverDMA_SPI_Init();
+	DisplayDriver_Init();
     TouchGFXGeneratedHAL::initialize();
+    LL_TIM_SetCounter(LINE_TIMER, 0xFFFF); // allow all display lines to be written
+    HAL::getInstance()->backPorchExited();
+    Display_DCS_Send(DISPLAY_ON);
+#else
+    TouchGFXGeneratedHAL::initialize();
+#endif
 }
 
 /**
@@ -163,14 +184,28 @@ void TouchGFXHAL::enableLCDControllerInterrupt()
 
 bool TouchGFXHAL::beginFrame()
 {
+	tearingEffectCount=0;
     return TouchGFXGeneratedHAL::beginFrame();
 }
 
 void TouchGFXHAL::endFrame()
 {
     TouchGFXGeneratedHAL::endFrame();
+    if (tearingEffectCount > 0)
+    {
+      touchgfx::OSWrappers::signalVSync();
+    }
 }
 
+#ifdef DragonEyeG0
+extern "C" int touchgfxDisplayDriverShouldTransferBlock(uint16_t bottom)
+{
+    // Only allow block transfer if the display has drawn past the bottom of the requested block (plus a margin of two lines)
+    // A timer is used to estimate how many lines have been drawn by setting the prescaler so the tick rate matches the line draw rate
+    uint16_t lastLineDrawn = LL_TIM_GetCounter(TIM17);
+    return bottom +2 < lastLineDrawn || tearingEffectCount >0;
+}
+#endif
 
 
 /* USER CODE END TouchGFXHAL.cpp */
