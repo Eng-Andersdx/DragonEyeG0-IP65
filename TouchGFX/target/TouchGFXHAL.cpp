@@ -23,6 +23,7 @@
 #include <TouchGFXHAL.hpp>
 
 /* USER CODE BEGIN TouchGFXHAL.cpp */
+#include <KeySampler.hpp>
 using namespace touchgfx;
 #include <dragoneye_leds.h>
 #include <de_lite_display.h>
@@ -31,6 +32,7 @@ using namespace touchgfx;
 extern TIM_HandleTypeDef htim1;
 static TIM_TypeDef* const LINE_TIMER = TIM17;
 extern volatile uint16_t tearingEffectCount;
+static KeySampler btnctrl;
 
 /* ******************************************************
  * Functions required by Partial Frame Buffer Strategy
@@ -64,10 +66,12 @@ void TouchGFXHAL::initialize()
 	DisplayDriver_Init();
     TouchGFXGeneratedHAL::initialize();
     LL_TIM_SetCounter(LINE_TIMER, 0xFFFF); // allow all display lines to be written
+    setButtonController(&btnctrl);
     HAL::getInstance()->backPorchExited();
     Display_DCS_Send(DISPLAY_ON);
 #else
     TouchGFXGeneratedHAL::initialize();
+    setButtonController(&btnctrl);
 #endif
 }
 
