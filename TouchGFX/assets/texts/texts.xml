@@ -4,16 +4,63 @@
     <Language Id="GB" />
   </Languages>
   <Texts>
-    <TextGroup Id="Group1" />
+    <TextGroup Id="Menu">
+      <Text Id="MENU_INFO" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">INFO</Translation>
+      </Text>
+      <Text Id="MENU_GUAGE" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">GAUGE</Translation>
+      </Text>
+      <Text Id="MENU_LIGHT" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">LIGHT</Translation>
+      </Text>
+      <Text Id="MENU_TEMPERATURE" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">HEAT</Translation>
+      </Text>
+      <Text Id="MENU_VOLUME" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">SOUND</Translation>
+      </Text>
+      <Text Id="MENU_BATTERY" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">CHARGE</Translation>
+      </Text>
+    </TextGroup>
     <TextGroup Id="Unsorted">
-      <Text Id="__SingleUse_CJQ2" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">Anders Electronics</Translation>
+      <Text Id="__SingleUse_338Z" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">RAM:&#10;Flash:&#10;SPI Flash:</Translation>
+      </Text>
+      <Text Id="__SingleUse_U8VH" Alignment="Right" TypographyId="MenuTitles">
+        <Translation Language="GB">16.9 / 144 KB&#10;124.9 / 128 KB&#10;1.5 / 8 MB</Translation>
+      </Text>
+      <Text Id="__SingleUse_YHC7" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">Memory</Translation>
+      </Text>
+      <Text Id="default_2digits" Alignment="Left" TypographyId="BigNumbers">
+        <Translation Language="GB">00</Translation>
+      </Text>
+      <Text Id="one_wildcard" Alignment="Center" TypographyId="BigNumbers">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="default_3digits" Alignment="Left" TypographyId="BigNumbers">
+        <Translation Language="GB">100</Translation>
+      </Text>
+      <Text Id="__SingleUse_6RMJ" Alignment="Left" TypographyId="Units">
+        <Translation Language="GB">bar</Translation>
+      </Text>
+      <Text Id="__SingleUse_H3V4" Alignment="Left" TypographyId="Units">
+        <Translation Language="GB">%</Translation>
+      </Text>
+      <Text Id="__SingleUse_9W0B" Alignment="Left" TypographyId="Units">
+        <Translation Language="GB">%</Translation>
+      </Text>
+      <Text Id="TemperatureTitleText" Alignment="Center" TypographyId="BigNumbers">
+        <Translation Language="GB">Temperature</Translation>
       </Text>
     </TextGroup>
   </Texts>
   <Typographies>
-    <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
-    <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
-    <Typography Id="Small" Font="verdana.ttf" Size="10" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="MenuTitles" Font="SairaSemiCondensed-Bold.ttf" Size="24" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="BigNumbers" Font="ShareTechMono-Regular.ttf" Size="100" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="Units" Font="SairaSemiCondensed-Bold.ttf" Size="36" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="Typography_00" Font="verdana.ttf" Size="15" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
   </Typographies>
 </TextDatabase>

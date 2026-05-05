@@ -2,6 +2,7 @@
 #define FRONTENDAPPLICATION_HPP
 
 #include <gui_generated/common/FrontendApplicationBase.hpp>
+#include <gui/common/HapticLogic.hpp>
 
 class FrontendHeap;
 
@@ -18,7 +19,6 @@ public:
         model.tick();
         FrontendApplicationBase::handleTickEvent();
     }
-private:
 };
 
 #endif // FRONTENDAPPLICATION_HPP

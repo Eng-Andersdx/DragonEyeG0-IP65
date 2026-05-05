@@ -1,0 +1,963 @@
+{
+  "Application": {
+    "Screens": [
+      {
+        "Name": "DELiteSplashScreen",
+        "Components": [
+          {
+            "Type": "Image",
+            "Name": "Image4",
+            "Width": 240,
+            "Height": 240,
+            "RelativeFilename": "logo_DE_Lite.png"
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "SplashScreenDelay",
+            "HasCompletedTrigger": true,
+            "Trigger": {
+              "Type": "TriggerInteractionCompleted",
+              "InteractionToTriggerOn": "BacklightIntensityControl"
+            },
+            "Action": {
+              "Type": "ActionDelay",
+              "Duration": 1000
+            }
+          },
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "WhiteLedOn"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerInteractionCompleted",
+              "InteractionToTriggerOn": "SplashScreenDelay"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "BacklightIntensityControl",
+            "HasCompletedTrigger": true,
+            "Trigger": {
+              "Type": "TriggerScreenEntered"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "backlightIntensityControl"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "MenuScreen",
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "backgroundBox",
+            "Width": 240,
+            "Height": 240
+          },
+          {
+            "Type": "ScrollWheel",
+            "Name": "menuScrollWheel",
+            "X": 18,
+            "Width": 80,
+            "Height": 240,
+            "SelectedItemOffset": 55,
+            "ItemTemplateName": "MenuIconCustomContainer",
+            "NumberofItems": 6,
+            "InitialElement": 1,
+            "ItemMargin": 25,
+            "Easing": "Back",
+            "EasingOption": "Out",
+            "SwipeAcceleration": 1.0,
+            "DragAcceleration": 1.0,
+            "OverShootPercentage": 75
+          },
+          {
+            "Type": "Image",
+            "Name": "gradientImage",
+            "X": 184,
+            "Width": 56,
+            "Height": 240,
+            "RelativeFilename": "battery_menu_gradient.png",
+            "Moveable": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "titleTextArea",
+            "X": 116,
+            "Y": 104,
+            "Width": 82,
+            "Height": 24,
+            "TextId": "MENU_BATTERY",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            },
+            "Fadeable": true
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 1
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "goRight"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "goLeft"
+            }
+          },
+          {
+            "InteractionName": "Interaction3",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 2
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "enter"
+            }
+          },
+          {
+            "InteractionName": "Interaction4",
+            "Trigger": {
+              "Type": "TriggerWhen",
+              "ActionCustomTypeName": "Call MenuScreen goToBattery"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "BatteryScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction5",
+            "Trigger": {
+              "Type": "TriggerWhen",
+              "ActionCustomTypeName": "Call MenuScreen goToVolume"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "VolumeScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction6",
+            "Trigger": {
+              "Type": "TriggerWhen",
+              "ActionCustomTypeName": "Call MenuScreen goToLight"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "LightScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction7",
+            "Trigger": {
+              "Type": "TriggerWhen",
+              "ActionCustomTypeName": "Call MenuScreen goToTemperature"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "TemperatureScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction8",
+            "Trigger": {
+              "Type": "TriggerWhen",
+              "ActionCustomTypeName": "Call MenuScreen goToSpeed"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "GaugeScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction9",
+            "Trigger": {
+              "Type": "TriggerWhen",
+              "ActionCustomTypeName": "Call MenuScreen goToInfo"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "InfoScreen2"
+            }
+          },
+          {
+            "InteractionName": "Interaction10",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "MainMenuLedOn"
+            }
+          }
+        ],
+        "CustomActions": [
+          {
+            "Name": "goToVolume"
+          },
+          {
+            "Name": "goToLight"
+          },
+          {
+            "Name": "goToTemperature"
+          },
+          {
+            "Name": "goToSpeed"
+          },
+          {
+            "Name": "goToBattery"
+          },
+          {
+            "Name": "goToInfo"
+          }
+        ]
+      },
+      {
+        "Name": "GaugeScreen",
+        "Components": [
+          {
+            "Type": "Image",
+            "Name": "backgroundImage",
+            "Width": 240,
+            "Height": 240,
+            "RelativeFilename": "gauge_background.png",
+            "Clickable": true
+          },
+          {
+            "Type": "Image",
+            "Name": "needleImage",
+            "X": 28,
+            "Y": 150,
+            "Width": 60,
+            "Height": 56,
+            "RelativeFilename": "gauge_needle\\gauge_needle_00.png"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "unitTextArea",
+            "X": 95,
+            "Y": 183,
+            "Width": 50,
+            "Height": 36,
+            "TextId": "__SingleUse_6RMJ",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "CustomContainerInstance",
+            "Name": "bigNumberCustomContainer1",
+            "X": 75,
+            "Y": 85,
+            "Width": 90,
+            "Height": 70,
+            "CustomContainerDefinitionName": "BigNumberCustomContainer"
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 3
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 1
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "increasePressure"
+            }
+          },
+          {
+            "InteractionName": "Interaction3",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "decreasePressure"
+            }
+          },
+          {
+            "InteractionName": "Interaction4",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "GuageMenuLedOn"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "BatteryScreen",
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "fillBox",
+            "Width": 240,
+            "Height": 240,
+            "Color": {
+              "Red": 17,
+              "Green": 141,
+              "Blue": 53
+            },
+            "Clickable": true
+          },
+          {
+            "Type": "AnimatedImage",
+            "Name": "waveAnimatedImage",
+            "Y": 108,
+            "Width": 240,
+            "Height": 24,
+            "FileNameFirst": "battery_animation\\battery_wave_00.png",
+            "FileNameLast": "battery_animation\\battery_wave_39.png",
+            "UpdateTicksInterval": 50,
+            "StartOnLoad": true,
+            "LoopEnabled": true
+          },
+          {
+            "Type": "TiledImage",
+            "Name": "backgroundTiledImage",
+            "Width": 240,
+            "Height": 108,
+            "FileName": "battery_background.png"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "percentTextArea",
+            "X": 106,
+            "Y": 176,
+            "Width": 29,
+            "Height": 36,
+            "TextId": "__SingleUse_H3V4",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "Container",
+            "Name": "numberContainer",
+            "X": 48,
+            "Y": 85,
+            "Width": 144,
+            "Height": 70,
+            "Components": [
+              {
+                "Type": "TextArea",
+                "Name": "chargeTextArea",
+                "Y": -30,
+                "Width": 144,
+                "Height": 100,
+                "TextId": "one_wildcard",
+                "TextRotation": "0",
+                "Color": {
+                  "Red": 255,
+                  "Green": 255,
+                  "Blue": 255
+                },
+                "Wildcard1": {
+                  "TextId": "default_3digits",
+                  "UseBuffer": true,
+                  "BufferSize": 10
+                }
+              }
+            ]
+          },
+          {
+            "Type": "Image",
+            "Name": "chargeIconImage",
+            "X": 111,
+            "Y": 26,
+            "Width": 19,
+            "Height": 29,
+            "RelativeFilename": "battery_icon.png"
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 3
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 1
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "increaseSpeed"
+            }
+          },
+          {
+            "InteractionName": "Interaction3",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "decreaseSpeed"
+            }
+          },
+          {
+            "InteractionName": "Interaction4",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "ChargeMenuLedOn"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "VolumeScreen",
+        "CanvasBufferSize": 3600,
+        "Components": [
+          {
+            "Type": "CircleProgress",
+            "Name": "circleProgress",
+            "Width": 240,
+            "Height": 240,
+            "Color": {
+              "Green": 199,
+              "Blue": 255
+            },
+            "CenterX": 120.0,
+            "CenterY": 120.0,
+            "Radius": 110.0,
+            "LineWidth": 20.0,
+            "StartAngle": -141.0,
+            "EndAngle": 141.0,
+            "CapPrecision": "Round",
+            "FileNameBackground": "sound_background.png",
+            "ProgressRangeMax": 30,
+            "ProgressInitialValue": 21,
+            "Clickable": true
+          },
+          {
+            "Type": "CustomContainerInstance",
+            "Name": "bigNumberCustomContainer1",
+            "X": 75,
+            "Y": 85,
+            "Width": 90,
+            "Height": 70,
+            "CustomContainerDefinitionName": "BigNumberCustomContainer"
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 3
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 1
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "increaseVolume"
+            }
+          },
+          {
+            "InteractionName": "Interaction3",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "decreaseVolume"
+            }
+          },
+          {
+            "InteractionName": "Interaction4",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "VolumeScreenLedOn"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "LightScreen",
+        "Components": [
+          {
+            "Type": "ImageProgress",
+            "Name": "lightImageProgress",
+            "Width": 240,
+            "Height": 240,
+            "FileNameProgress": "light_fill.png",
+            "AnchorAtZero": true,
+            "Direction": "Up",
+            "FileNameBackground": "light_background.png",
+            "IndicatorPositionX": 28,
+            "IndicatorPositionY": 28,
+            "IndicatorPositionWidth": 184,
+            "IndicatorPositionHeight": 177,
+            "ProgressRangeMax": 100,
+            "ProgressInitialValue": 100,
+            "Clickable": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "percentTextArea",
+            "X": 106,
+            "Y": 161,
+            "Width": 29,
+            "Height": 36,
+            "TextId": "__SingleUse_9W0B",
+            "TextRotation": "0",
+            "AutoSize": true
+          },
+          {
+            "Type": "Container",
+            "Name": "numberContainer",
+            "X": 48,
+            "Y": 85,
+            "Width": 144,
+            "Height": 70,
+            "Components": [
+              {
+                "Type": "TextArea",
+                "Name": "lightTextArea",
+                "Y": -30,
+                "Width": 144,
+                "Height": 100,
+                "TextId": "one_wildcard",
+                "TextRotation": "0",
+                "Wildcard1": {
+                  "TextId": "default_3digits",
+                  "UseBuffer": true,
+                  "BufferSize": 10
+                }
+              }
+            ]
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 3
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 1
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "increaseBrightness"
+            }
+          },
+          {
+            "InteractionName": "Interaction3",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "decreaseBrightness"
+            }
+          },
+          {
+            "InteractionName": "Interaction4",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "LightScreenLedOn"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "TemperatureScreen",
+        "Components": [
+          {
+            "Type": "Image",
+            "Name": "image2",
+            "Width": 240,
+            "Height": 240,
+            "RelativeFilename": "heat_fill.png",
+            "Clickable": true
+          },
+          {
+            "Type": "CustomContainerInstance",
+            "Name": "bigNumberCustomContainer1",
+            "X": 75,
+            "Y": 85,
+            "Width": 90,
+            "Height": 70,
+            "CustomContainerDefinitionName": "BigNumberCustomContainer"
+          },
+          {
+            "Type": "Container",
+            "Name": "fillContainer",
+            "Width": 240,
+            "Height": 120,
+            "Components": [
+              {
+                "Type": "Image",
+                "Name": "image1",
+                "Width": 240,
+                "Height": 240,
+                "RelativeFilename": "heat_background.png"
+              },
+              {
+                "Type": "CustomContainerInstance",
+                "Name": "bigNumberCustomContainer2",
+                "X": 75,
+                "Y": 85,
+                "Width": 90,
+                "Height": 70,
+                "CustomContainerDefinitionName": "BigNumberCustomContainer"
+              }
+            ]
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "BackToMenu",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 3
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "IncreaseTemperature",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 1
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "increaseTemperature"
+            }
+          },
+          {
+            "InteractionName": "DecreaseTemperature",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "decreaseTemperature"
+            }
+          },
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "TemperatureMenuLedOn"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "InfoScreen2",
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "backGroundBox",
+            "Width": 240,
+            "Height": 240,
+            "Clickable": true
+          },
+          {
+            "Type": "Box",
+            "Name": "bottomBox",
+            "Y": 200,
+            "Width": 240,
+            "Height": 40,
+            "Color": {
+              "Red": 217,
+              "Green": 217,
+              "Blue": 217
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "topBox",
+            "Width": 240,
+            "Height": 40,
+            "Color": {
+              "Red": 217,
+              "Green": 217,
+              "Blue": 217
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "titleTextArea",
+            "X": 78,
+            "Y": 6,
+            "Width": 84,
+            "Height": 29,
+            "TextId": "__SingleUse_YHC7",
+            "TextRotation": "0",
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "NumbersTextArea",
+            "X": 88,
+            "Y": 68,
+            "Width": 145,
+            "Height": 87,
+            "TextId": "__SingleUse_U8VH",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 217,
+              "Green": 217,
+              "Blue": 217
+            },
+            "AutoSize": true
+          },
+          {
+            "Type": "TextArea",
+            "Name": "regionsTextArea",
+            "X": 7,
+            "Y": 68,
+            "Width": 100,
+            "Height": 87,
+            "TextId": "__SingleUse_338Z",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 217,
+              "Green": 217,
+              "Blue": 217
+            },
+            "AutoSize": true
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "BackToMenu",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 3
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerScreenTransitionBegins"
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "infoScreenLedOn"
+            }
+          }
+        ]
+      }
+    ],
+    "CustomContainerDefinitions": [
+      {
+        "Name": "MenuIconCustomContainer",
+        "Width": 80,
+        "Height": 80,
+        "Components": [
+          {
+            "Type": "Image",
+            "Name": "iconImage",
+            "Width": 80,
+            "Height": 80,
+            "RelativeFilename": "battery_menu_icon.png"
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerNone"
+            },
+            "Action": {
+              "Type": "ActionNone"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "BigNumberCustomContainer",
+        "Width": 90,
+        "Height": 70,
+        "Components": [
+          {
+            "Type": "TextArea",
+            "Name": "valueTextArea",
+            "Y": -30,
+            "Width": 90,
+            "Height": 100,
+            "TextId": "one_wildcard",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            },
+            "Wildcard1": {
+              "TextId": "default_2digits",
+              "UseBuffer": true,
+              "BufferSize": 10
+            }
+          }
+        ],
+        "Interactions": []
+      }
+    ],
+    "Name": "DragonEyeG0_CAN",
+    "Resolution": {
+      "Width": 240,
+      "Height": 240
+    },
+    "SelectedColorDepth": 16,
+    "StartupScreenName": "DELiteSplashScreen",
+    "SelectedStartupLanguage": "GB",
+    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "UIPath": ".",
+    "AvailableColorDepths": [
+      16
+    ],
+    "AvailableLCDs": {
+      "16": "LCD16bppSerialFlash"
+    },
+    "AvailableSections": [
+      "ExtFlashSection",
+      "IntFlashSection"
+    ],
+    "AvailableResolutions": [
+      {
+        "Width": 240,
+        "Height": 240
+      }
+    ],
+    "PhysicalButtons": [],
+    "FrameworkFeatures": {
+      "LCD16bppSerialFlash": {
+        "Id": "LCD16bppSerialFlash",
+        "IsEnabled": false
+      }
+    },
+    "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
+    "PostGenerateCommand": "touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+    "PostGenerateTargetCommand": "touchgfx update_project",
+    "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
+    "RunSimulatorCommand": "build\\bin\\simulator.exe",
+    "LandscapeSkinX": 0,
+    "LandscapeSkinY": 0,
+    "PortraitSkinX": 0,
+    "PortraitSkinY": 0,
+    "DisplayOrientation": "Landscape",
+    "Family": "STM32G0",
+    "SubFamily": "STM32G0x1",
+    "Toolchain": "STM32CubeIDE",
+    "Platform": "m0+",
+    "ProjectFile": "../DragonEyeG0_CAN.ioc",
+    "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
+    "OptionalComponents": [],
+    "AdditionalFeatures": []
+  },
+  "Version": "4.26.1"
+}
