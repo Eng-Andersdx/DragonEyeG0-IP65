@@ -8,6 +8,7 @@ node_modules/
 dist/
 Debug/
 TouchGFX/build
+TouchGFX/generated/*
 
 # Compiled Java class files
 *.class
@@ -48,3 +49,4 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+*.cache
