@@ -117,7 +117,7 @@
             "InteractionName": "Interaction1",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 1
+              "ButtonKey": 54
             },
             "Action": {
               "Type": "ActionCustom",
@@ -127,7 +127,8 @@
           {
             "InteractionName": "Interaction2",
             "Trigger": {
-              "Type": "TriggerPhysicalButtonClicked"
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
@@ -138,7 +139,7 @@
             "InteractionName": "Interaction3",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 2
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionCustom",
@@ -312,7 +313,7 @@
             "InteractionName": "Interaction2",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 1
+              "ButtonKey": 54
             },
             "Action": {
               "Type": "ActionCustom",
@@ -322,7 +323,8 @@
           {
             "InteractionName": "Interaction3",
             "Trigger": {
-              "Type": "TriggerPhysicalButtonClicked"
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
@@ -447,7 +449,7 @@
             "InteractionName": "Interaction2",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 1
+              "ButtonKey": 54
             },
             "Action": {
               "Type": "ActionCustom",
@@ -457,7 +459,8 @@
           {
             "InteractionName": "Interaction3",
             "Trigger": {
-              "Type": "TriggerPhysicalButtonClicked"
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
@@ -528,7 +531,7 @@
             "InteractionName": "Interaction2",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 1
+              "ButtonKey": 54
             },
             "Action": {
               "Type": "ActionCustom",
@@ -538,7 +541,8 @@
           {
             "InteractionName": "Interaction3",
             "Trigger": {
-              "Type": "TriggerPhysicalButtonClicked"
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
@@ -630,7 +634,7 @@
             "InteractionName": "Interaction2",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 1
+              "ButtonKey": 54
             },
             "Action": {
               "Type": "ActionCustom",
@@ -640,7 +644,8 @@
           {
             "InteractionName": "Interaction3",
             "Trigger": {
-              "Type": "TriggerPhysicalButtonClicked"
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
@@ -721,7 +726,7 @@
             "InteractionName": "IncreaseTemperature",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 1
+              "ButtonKey": 54
             },
             "Action": {
               "Type": "ActionCustom",
@@ -731,7 +736,8 @@
           {
             "InteractionName": "DecreaseTemperature",
             "Trigger": {
-              "Type": "TriggerPhysicalButtonClicked"
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
