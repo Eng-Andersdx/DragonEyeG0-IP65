@@ -165,14 +165,14 @@ bool KeySampler::sample(uint8_t& key)
 	 if(result==0 && PrevStata_BLeft != result){
 		 PrevStata_BLeft = result;
 		 BSP_ENC_ResetRotationValue();
-		 key=0;
+		 key=52;
 	     return true;
 	 }
 	 PrevStata_BLeft = result;
 
 	 result=BSP_PB_GetState(BUTTON_RIGHT);
 	 if(result==0 && PrevStata_BRight != result){
-	 	key=1;
+	 	key=54;
 	   	PrevStata_BRight = result;
 	   	BSP_ENC_ResetRotationValue();
 	    return true;
@@ -183,7 +183,7 @@ bool KeySampler::sample(uint8_t& key)
 	 result=BSP_PB_GetState(BUTTON_PUSH);
 	 if(result==0 && PrevStata_BPush != result){
 	    PrevStata_BPush = result;
-	    key=2;
+	    key=53;
 	    return true;
 	 }
 	 PrevStata_BPush = result;

@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          	: STM32TouchController.hpp
-  * Version				: 1.2
   ******************************************************************************
   * This file was created by TouchGFX Generator 4.26.0. This file is only
   * generated once! Delete this file from your project and re-generate code
@@ -10,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2026 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -26,9 +25,7 @@
 /* USER CODE BEGIN STM32TouchController */
 
 #ifndef __TOUCH_CONTROLLER_HPP
-#define __TOUCH_CONTROLLER_HPP  0102 /* BSP Touch API REVISION v.1.2 */
-
-#define st1x33i_240x240
+#define __TOUCH_CONTROLLER_HPP  0105 /* BSP Touch API REVISION v.1.5 */
 
 #ifdef st1x33i_240x240
 /* Maximum border values of the touchscreen pad */
@@ -40,6 +37,14 @@
 
 #endif
 
+#ifdef st1x33i_800x480
+/* Maximum border values of the touchscreen pad (5" DEU5_5R, 800x480) */
+#define  ST_1633I_MAX_WIDTH              ((uint16_t)800)     /* Touchscreen pad max width   */
+#define  ST_1633I_MAX_HEIGHT             ((uint16_t)480)    /* Touchscreen pad max height  */
+
+#define  ST_1633I_MAX_WIDTH_HEIGHT       ((uint16_t)800)
+#endif
+
 #ifdef st1x33i_480x480
 /* Maximum border values of the touchscreen pad */
 #define  ST_1633I_MAX_WIDTH              ((uint16_t)480)     /* Touchscreen pad max width   */
@@ -49,7 +54,7 @@
 #define  ST_1633I_MAX_WIDTH_HEIGHT       ((uint16_t)480)
 #endif
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 
 /* Maximum Touch */
 #define TS_MAX_NB_TOUCH 				((uint8_t) 4)
@@ -263,7 +268,7 @@ xyz_data_t xyz_data[10];
 } touch_data_t;
 
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 /**
 *  @brief TS_StateTypeDef
 *  Define TS State structure
@@ -328,7 +333,7 @@ typedef enum
 } TS_TouchEventTypeDef;
 
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 uint8_t 		BSP_TS_Init(uint16_t ts_SizeX, uint16_t ts_SizeY);
 void 			ST1633I_TouchDtect (touch_data_t * , uint8_t *);
 extern void     TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
