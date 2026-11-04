@@ -40,12 +40,12 @@ bool TouchGFXGeneratedDataReader::addressIsAddressable(const void* address)
 
 void TouchGFXGeneratedDataReader::copyData(const void* src, void* dst, uint32_t bytes)
 {
-    /* If requested number of bytes are less than 250
+    /* If requested number of bytes are less than 10
      * CPU and polling will be used to read from flash.
-     * If number of bytes requested is larger than 250
+     * If number of bytes requested is larger than 10
      * a DMA transfer will be started.
      */
-    if (bytes < 250)
+    if (bytes < 10)
     {
         /* Start transfer using the CPU */
         DataReader_ReadData((uint32_t)src, (uint8_t*)dst, bytes);
