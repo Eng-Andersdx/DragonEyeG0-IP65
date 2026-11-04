@@ -9,6 +9,7 @@ dist/
 Debug/
 TouchGFX/build
 TouchGFX/generated/*
+Drivers/*
 
 # Compiled Java class files
 *.class
