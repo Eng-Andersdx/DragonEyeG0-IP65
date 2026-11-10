@@ -61,12 +61,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define STMG0_485_DIR_Pin GPIO_PIN_13
 #define STMG0_485_DIR_GPIO_Port GPIOC
-#define HALL_S1_Pin GPIO_PIN_6
-#define HALL_S1_GPIO_Port GPIOA
-#define HALL_S1_EXTI_IRQn EXTI4_15_IRQn
-#define HALL_S2_Pin GPIO_PIN_7
+#define HALL_S2_Pin GPIO_PIN_6
 #define HALL_S2_GPIO_Port GPIOA
 #define HALL_S2_EXTI_IRQn EXTI4_15_IRQn
+#define HALL_S1_Pin GPIO_PIN_7
+#define HALL_S1_GPIO_Port GPIOA
+#define HALL_S1_EXTI_IRQn EXTI4_15_IRQn
 #define DISPLAY_CSX_Pin GPIO_PIN_0
 #define DISPLAY_CSX_GPIO_Port GPIOB
 #define CTP_INT_Pin GPIO_PIN_1

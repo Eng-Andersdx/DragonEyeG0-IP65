@@ -2,7 +2,6 @@
 /**
   ******************************************************************************
   * File Name          	: STM32TouchController.cpp
-  * Version				: 1.2
   ******************************************************************************
   * This file was created by TouchGFX Generator 4.26.0. This file is only
   * generated once! Delete this file from your project and re-generate code
@@ -10,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2025 STMicroelectronics.
+  * Copyright (c) 2026 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -28,6 +27,9 @@
  * 1.0     | 2025-10-07 | H.Hunain  | Added driver for st1x33i
  * 1.1     | 2025-10-07 | H.Hunain  | Added driver for DATAIMAGE_MICROCHIP_TOUCH_IC
  * 1.2     | 2026-04-08 | R.Gopan   | Added driver for st1x33i_240x240 and enhanced portability
+ * 1.3	   | 2026-25-08 | H.Hunain  | Backwards compatibility fixed for product range
+ * 1.4     | 2026-11-02 | H.Hunain  | Added st1x33i_800x480 for the 5" DEU5_5R (800x480)
+ * 1.5     | 2026-11-04 | R.Gopan   | Removed stm32u5xx_hal.h from the header
  * -----------------------------------------------------------------------------
  * Notes:
  * - Always increment version when making manual changes.
@@ -39,16 +41,17 @@
 /* USER CODE BEGIN STM32TouchController */
 #include <STM32TouchController.hpp>
 #include "main.h"
+#include"bsp.h"
 #include "math.h"
 
-#if __TOUCH_CONTROLLER_HPP != 0102	/* BSP Touch REVISION v.1.2 */
+#if __TOUCH_CONTROLLER_HPP != 0105	/* BSP Touch REVISION v.1.5 */
 #error Wrong API version file (STM32TouchController.hpp).
 #endif
 
 static bool TS_initialized = false;
 volatile uint8_t Touch_Event_Flag = 0;
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 static TS_StateTypeDef  TS_State = {0};
 touch_data_t ST_1633ITouchData;
 uint8_t  I2C_Address = ST1633I_ADD_REG<<1;
@@ -62,11 +65,11 @@ static bool touch_active = false;
 static uint32_t touch_start_time = 0;
 #endif
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-
 extern I2C_HandleTypeDef hi2c2;
-
-
 using namespace touchgfx;
+#ifdef DEU5_2_1R
+extern uint8_t haptic_feedback;
+#endif
 uint8_t touch_happened = 0;
 
 uint32_t old = 0;
@@ -81,13 +84,16 @@ void STM32TouchController::init()
 #ifdef st1x33i_480x480
 		BSP_TS_Init(480,480);
 #endif
+#ifdef st1x33i_800x480
+		BSP_TS_Init(800,480);
+#endif
 		TS_initialized = true;
 	}
 }
 
 bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
 {
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 
 	static int32_t lastX = 0;
 	static int32_t lastY = 0;
@@ -108,10 +114,30 @@ bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
 		if(TS_State.touchDetected){
 			if(touch_happened==0){
 				touch_happened = 1;
+#ifdef DEU5_2_1R
+				haptic_feedback = 2;
+#endif
 			}
 
 			int32_t newX = TS_State.touchX[0];
 			int32_t newY = TS_State.touchY[0];
+#ifdef st1x33i_800x480
+			/* 5" panel: if touches come out rotated or mirrored, define TS_SWAP_XY,
+			 * TS_MIRROR_X and/or TS_MIRROR_Y in bsp.h */
+#ifdef TS_SWAP_XY
+			{ int32_t t = newX; newX = newY; newY = t; }
+#endif
+#ifdef TS_MIRROR_X
+			newX = (ST_1633I_MAX_WIDTH - 1) - newX;
+#endif
+#ifdef TS_MIRROR_Y
+			newY = (ST_1633I_MAX_HEIGHT - 1) - newY;
+#endif
+			if (newX < 0) newX = 0;
+			if (newY < 0) newY = 0;
+			if (newX > ST_1633I_MAX_WIDTH - 1)  newX = ST_1633I_MAX_WIDTH - 1;
+			if (newY > ST_1633I_MAX_HEIGHT - 1) newY = ST_1633I_MAX_HEIGHT - 1;
+#endif
 
 			// ---- Jitter filter (dead zone of 15 pixels) ----
 			if (abs(newX - lastX) < 15 && abs(newY - lastY) < 15)
@@ -165,7 +191,7 @@ bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
     return false;
 }
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 
 void TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value) {
 	HAL_I2C_Mem_Write(&hi2c2, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, &Value, 1, 10000);
