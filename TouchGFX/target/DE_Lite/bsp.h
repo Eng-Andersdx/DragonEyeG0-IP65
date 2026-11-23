@@ -29,6 +29,7 @@
 
 #define DragonEyeG0
 #define st1x33i_240x240
+#include "knob_interface.hpp"
 
 #define  GPIO_SPEED_HIGH                GPIO_SPEED_FREQ_VERY_HIGH
  /* Includes ------------------------------------------------------------------*/
