@@ -27,7 +27,7 @@
 
 
 #ifndef __KEYSAMPLER_HPP
-#define __KEYSAMPLER_HPP  0100 /* BSP Rotary API REVISION v.1.0 */
+#define __KEYSAMPLER_HPP  0101 /* BSP Rotary API REVISION v.1.0 */
 
 /** @brief EncoderPushValue_TypeDef
   *  Anders DVK board Encoders Push Button definition.

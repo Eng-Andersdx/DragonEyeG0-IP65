@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    KeySampler.cpp
   * @author  Anders Engineering Team
-  * @version 1.0
+  * @version 1.1
   * @brief   This file provides a set of functions needed to sense rotation of rotary
   ******************************************************************************
   * @attention
@@ -24,6 +24,8 @@
  * -----------------------------------------------------------------------------
  * -----------------------------------------------------------------------------
  * 1.0     | 2025-06-10 | R.Gopan   | Initial BSP
+ * 1.1     | 2026-11-23 | R.Gopan   | Updated the Encoder Key Events to 52, 53 and 54
+ * 									  knobTick() for haptic timing
  * -----------------------------------------------------------------------------
  * Notes:
  * - Always increment version when making manual changes.
@@ -44,7 +46,7 @@ static TIM_TypeDef* const LINE_TIMER = TIM17;
 volatile int val;
 extern volatile uint8_t Touch_Event_Flag;
 
-#if __KEYSAMPLER_HPP != 0100	/* BSP Rotary REVISION v.1.0 */
+#if __KEYSAMPLER_HPP != 0101	/* BSP Rotary REVISION v.1.0 */
 #error Wrong API version file (KeySampler.hpp).
 #endif
 
@@ -86,9 +88,6 @@ signed long			lEncoderPosition = 0;
 static uint8_t             clockwise_counter=0;
 static uint8_t             anti_clockwise_counter=0;
 static uint8_t             push_counter=0;
-volatile uint32_t pushStartTick = 0;
-volatile uint32_t pushDuration  = 0;
-#define LONG_PRESS_THRESHOLD 1000
 uint8_t				ui8EncoderPushed = 0;
 
 static uint8_t lastABState = 0;
@@ -147,9 +146,10 @@ uint32_t PrevStata_BPush=1;
   */
 void KeySampler::init()
 {
-	BSP_PB_Init(BUTTON_LEFT, BUTTON_MODE_EXTI);
-	BSP_PB_Init(BUTTON_RIGHT, BUTTON_MODE_EXTI);
-	BSP_PB_Init(BUTTON_PUSH, BUTTON_MODE_EXTI);
+	vui8EncoderState_Prev = 0;
+	vlEncoderPosition_Int = 0;
+	lEncoderPosition = 0;
+	ui8EncoderPushed = 0;
 }
 
 /**
@@ -159,6 +159,7 @@ void KeySampler::init()
   */
 bool KeySampler::sample(uint8_t& key)
 {
+	 knobTick();
 	 uint32_t result = 0;
 
 	 result=BSP_PB_GetState(BUTTON_LEFT);
@@ -178,7 +179,6 @@ bool KeySampler::sample(uint8_t& key)
 	    return true;
 	 }
 	 PrevStata_BRight = result;
-
 
 	 result=BSP_PB_GetState(BUTTON_PUSH);
 	 if(result==0 && PrevStata_BPush != result){
@@ -466,6 +466,5 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	if(GPIO_Pin==ENCODER_PIN[PUSH_BUTTON]) {
 			Touch_Event_Flag = 1;
-			ui8EncoderPushed = ENC_PB_PUSHED;
 	}
 }
