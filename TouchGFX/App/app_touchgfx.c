@@ -2,7 +2,7 @@
   ******************************************************************************
   * File Name          : app_touchgfx.c
   ******************************************************************************
-  * This file was created by TouchGFX Generator 4.26.1. This file is only
+  * This file was created by TouchGFX Generator 4.27.0. This file is only
   * generated once! Delete this file from your project and re-generate code
   * using STM32CubeMX or change this file manually to update it.
   ******************************************************************************
@@ -57,6 +57,10 @@ void touchgfx_taskEntry(void);
  */
 void MX_TouchGFX_Init(void)
 {
+    /* USER CODE BEGIN Init */
+
+    /* USER CODE END Init */
+
     // Calling forward to touchgfx_init in C++ domain
     touchgfx_components_init();
     touchgfx_init();

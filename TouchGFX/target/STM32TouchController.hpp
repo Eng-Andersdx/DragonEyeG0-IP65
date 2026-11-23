@@ -25,7 +25,12 @@
 /* USER CODE BEGIN STM32TouchController */
 
 #ifndef __TOUCH_CONTROLLER_HPP
-#define __TOUCH_CONTROLLER_HPP  0105 /* BSP Touch API REVISION v.1.5 */
+#define __TOUCH_CONTROLLER_HPP  0106 /* BSP Touch API REVISION v.1.7 */
+
+#if defined(DragonEyeG0) || defined(DragonEyeH5)
+#include "KeySampler.hpp"
+#endif
+
 
 #ifdef st1x33i_240x240
 /* Maximum border values of the touchscreen pad */
@@ -34,6 +39,16 @@
 
 /* Touchscreen pad max width and height values for FT6xx6 Touch*/
 #define  ST_1633I_MAX_WIDTH_HEIGHT       ((uint16_t)240)
+
+#endif
+
+#ifdef st1x33i_360x360
+/* Maximum border values of the touchscreen pad */
+#define  ST_1633I_MAX_WIDTH              ((uint16_t)360)     /* Touchscreen pad max width   */
+#define  ST_1633I_MAX_HEIGHT             ((uint16_t)360)    /* Touchscreen pad max height  */
+
+/* Touchscreen pad max width and height values for FT6xx6 Touch*/
+#define  ST_1633I_MAX_WIDTH_HEIGHT       ((uint16_t)360)
 
 #endif
 
@@ -54,7 +69,7 @@
 #define  ST_1633I_MAX_WIDTH_HEIGHT       ((uint16_t)480)
 #endif
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_360x360) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 
 /* Maximum Touch */
 #define TS_MAX_NB_TOUCH 				((uint8_t) 4)
@@ -264,11 +279,11 @@ typedef struct{
 
 typedef struct {
 AdvanceTouchInfo_t tsinfo;
-xyz_data_t xyz_data[10];
+xyz_data_t xyz_data[1];
 } touch_data_t;
 
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_360x360) ||  defined(st1x33i_480x480) || defined(st1x33i_800x480)
 /**
 *  @brief TS_StateTypeDef
 *  Define TS State structure
@@ -333,7 +348,7 @@ typedef enum
 } TS_TouchEventTypeDef;
 
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_360x360) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 uint8_t 		BSP_TS_Init(uint16_t ts_SizeX, uint16_t ts_SizeY);
 void 			ST1633I_TouchDtect (touch_data_t * , uint8_t *);
 extern void     TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
