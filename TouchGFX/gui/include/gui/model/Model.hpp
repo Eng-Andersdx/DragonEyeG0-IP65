@@ -16,7 +16,7 @@ public:
     }
 
     void tick();
-    void setAmbientLightRGB(bool red, bool green, bool blue);
+    void setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue);
     void sendCommand(char type, char value);
     void setSelectedDemoNumber(int value);
     int getSelectedDemoNumber();

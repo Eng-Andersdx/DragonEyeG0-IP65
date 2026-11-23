@@ -55,37 +55,25 @@
 #define GUI_INCLUDE_GUI_COMMON_HAPTICLOGIC_HPP_
 
 #pragma once
-#include "de_lite_haptic_sensor.h"
+#include <stdint.h>
+#ifdef KNOB_INTERFACE
+#include "knob_interface.hpp"            // knobHapticOn() / knobHapticOff(), board only
+#endif
 
 class HapticLogic
 {
 public:
     void trigger(uint16_t durationMs)
     {
-        BSP_HAPTIC_ON();
-        active = true;
-        startTick = HAL_GetTick();
-        duration = durationMs;
+#ifdef KNOB_INTERFACE
+        knobHapticPulse(durationMs);
+#else
+        (void)durationMs;
+#endif
     }
 
-    void update()
-    {
-        if (active)
-        {
-            if ((HAL_GetTick() - startTick) >= duration)
-            {
-                BSP_HAPTIC_OFF();
-                active = false;
-            }
-        }
-    }
-
-private:
-    uint32_t startTick = 0;
-    uint16_t duration = 0;
-    bool active = false;
+    void update() {}       // timing is on the board side now (knobTick in KeySampler)
 };
-
 
 
 #endif /* GUI_INCLUDE_GUI_COMMON_HAPTICLOGIC_HPP_ */

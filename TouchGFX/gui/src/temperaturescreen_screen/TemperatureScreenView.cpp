@@ -1,9 +1,8 @@
 #include <gui/temperaturescreen_screen/TemperatureScreenView.hpp>
 #include <touchgfx/Color.hpp>
-#include "DE_Lite/dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
 #include "math.h"
 
-extern TIM_HandleTypeDef htim1;
 
 TemperatureScreenView::TemperatureScreenView()
 	:temperatureImageProgressCallback(this, &TemperatureScreenView::TemperatureScreenClickHandler)
@@ -29,7 +28,8 @@ void TemperatureScreenView::setupScreen()
     bigNumberCustomContainer2.updateValue(currentTemperautre);
     bigNumberCustomContainer2.updateColor(touchgfx::Color::getColorFromRGB(229, 36, 62));
 
-    presenter->setAmbientLightRGB(true, false, false);
+//presenter->setAmbientLightRGB(true, false, false);
+    presenter->setAmbientLightRGB(LED_RED);
 
     //Setup the intro animation
     fillContainer.setHeight(HAL::DISPLAY_HEIGHT);
@@ -50,15 +50,16 @@ void TemperatureScreenView::handleTickEvent()
 
     haptic.update();
 
-    if (isPressed && !longPressTrigerred && !dragged){
-       	pressTicks++;
-          if (pressTicks > 60){
-       	   longPressTrigerred = true;
-       	   isPressed=false;
-       	   application().gotoMenuScreenScreenNoTransition();
-       	   pressTicks=0;
-          }
-    }
+    /* 2026-11-13: long press removed (tap -> key 53 from the touch driver). Previous: */
+//    if (isPressed && !longPressTrigerred && !dragged){
+//       	pressTicks++;
+//          if (pressTicks > 60){
+//       	   longPressTrigerred = true;
+//       	   isPressed=false;
+//       	   application().gotoMenuScreenScreenNoTransition();
+//       	   pressTicks=0;
+//          }
+//    }
 
     // Set the number text field visible on the first tick
     if (!bigNumberCustomContainer2.isVisible())
@@ -172,5 +173,6 @@ void TemperatureScreenView::updateFill(const int16_t newLevel)
 }
 
 void TemperatureScreenView::TemperatureMenuLedOn(){
-	BSP_LED_SetColor(RGB_RED);
+//	BSP_LED_SetColor(RGB_RED);
+	presenter->setAmbientLightRGB(LED_RED);
 }

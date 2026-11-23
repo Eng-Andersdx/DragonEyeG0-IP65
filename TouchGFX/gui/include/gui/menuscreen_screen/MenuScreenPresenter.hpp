@@ -28,7 +28,7 @@ public:
     virtual ~MenuScreenPresenter() {}
     void setSelectedDemoNumber(int value);
     int getSelectedDemoNumber();
-    void setAmbientLightRGB(bool red, bool green, bool blue);
+    void setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue);
 
 private:
     MenuScreenPresenter();

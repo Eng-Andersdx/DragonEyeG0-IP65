@@ -1,8 +1,8 @@
 #include <gui/infoscreen2_screen/InfoScreen2View.hpp>
-#include "DE_Lite/dragoneye_leds.h"
+//#include "DE_Lite/dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
 #include "math.h"
 
-extern TIM_HandleTypeDef htim1;
 
 InfoScreen2View::InfoScreen2View()
 	: infoScreenCallback(this, &InfoScreen2View::InfoScreenClickHandler)
@@ -26,20 +26,22 @@ void InfoScreen2View::tearDownScreen()
 }
 
 void InfoScreen2View::infoScreenLedOn(){
-	BSP_LED_SetColor(RGB_CYAN);
+//	BSP_LED_SetColor(RGB_CYAN);
+	presenter->setAmbientLightRGB(LED_CYAN);
 }
 
 
 void InfoScreen2View::handleTickEvent(){
-	  if (isPressed && !longPressTrigerred){
-	        	pressTicks++;
-	      if (pressTicks > 60){
-	       	   longPressTrigerred= true;
-	       	   isPressed=false;
-	       	   application().gotoMenuScreenScreenNoTransition();
-	       	   pressTicks=0;
-	      }
-	  }
+	  /* 2026-11-13: long press removed (tap -> key 53 from the touch driver). Previous: */
+//	  if (isPressed && !longPressTrigerred){
+//	        	pressTicks++;
+//	      if (pressTicks > 60){
+//	       	   longPressTrigerred= true;
+//	       	   isPressed=false;
+//	       	   application().gotoMenuScreenScreenNoTransition();
+//	       	   pressTicks=0;
+//	      }
+//	  }
 }
 
 void InfoScreen2View::InfoScreenClickHandler(const Box& box, const ClickEvent& evt){

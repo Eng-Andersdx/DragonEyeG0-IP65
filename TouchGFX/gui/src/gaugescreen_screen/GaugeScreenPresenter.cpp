@@ -27,7 +27,8 @@ int GaugeScreenPresenter::getPressure()
     return model->getPressure();
 }
 
-void GaugeScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)
+//void GaugeScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)   /* previous (bool) */
+void GaugeScreenPresenter::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     model->setAmbientLightRGB(red, green, blue);
 }

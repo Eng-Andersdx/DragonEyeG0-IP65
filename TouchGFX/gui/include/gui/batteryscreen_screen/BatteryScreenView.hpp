@@ -14,6 +14,9 @@ public:
     virtual void handleTickEvent();
     virtual void ChargeMenuLedOn() override;
     void BatteryScreenClickHandler (const Box& batteryImage, const ClickEvent& evt);
+    /* 2026-11-13: tap anywhere -> key 53 (back to MenuScreen), drag is not a tap */
+    virtual void handleClickEvent(const ClickEvent& evt);
+    virtual void handleDragEvent(const DragEvent& evt);
 
 protected:
     void updateBatteryIndicator();
@@ -27,6 +30,9 @@ private:
     uint8_t pressTicks;
     bool isPressed;
     bool longPressTrigerred;
+    int16_t tapStartX;   /* where the finger landed */
+    int16_t tapStartY;
+    bool    tapMoved;    /* moved > 15 px since landing -> drag, not a tap */
 };
 
 #endif // BATTERYSCREENVIEW_HPP

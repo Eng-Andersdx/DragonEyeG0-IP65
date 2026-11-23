@@ -3,8 +3,8 @@
 #include <touchgfx/Utils.hpp>
 #include <gui/common/MenuItems.hpp>
 
-#ifndef SIMULATOR
-#include "main.h"
+#ifdef KNOB_INTERFACE
+#include "knob_interface.hpp"
 #endif
 
 Model::Model() :
@@ -23,18 +23,12 @@ void Model::tick()
     }
 }
 
-void Model::setAmbientLightRGB(bool red, bool green, bool blue)
+void Model::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     touchgfx_printf("Ambient light set to: Red = %i, Green = %i, Blue = %i\r\n", red, green, blue); // Print to TouchGFX simulator debug log
 
-#ifdef LED_RED_GPIO_Port
-    HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, red ? GPIO_PIN_SET : GPIO_PIN_RESET);
-#endif
-#ifdef LED_BLUE_GPIO_Port
-    HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, blue ? GPIO_PIN_SET : GPIO_PIN_RESET);
-#endif
-#ifdef LED_GREEN_GPIO_Port
-    HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, green ? GPIO_PIN_SET : GPIO_PIN_RESET);
+#ifdef KNOB_INTERFACE
+    knobSetAmbientLightRGB(red, green, blue);
 #endif
 }
 
@@ -47,12 +41,11 @@ void Model::sendCommand(char type, char value)
     command[4] = '0' + value % 10;
 
     // Print to TouchGFX simulator debug log
-    touchgfx_printf("Transmitted on UART: "); 
+    touchgfx_printf("Transmitted on UART: ");
     touchgfx_printf((char*)command);
 
-#ifdef HAL_UART_MODULE_ENABLED
-//    extern UART_HandleTypeDef huart1;
-//    HAL_UART_Transmit(&huart1, command, sizeof(command), 100);
+#ifdef KNOB_INTERFACE
+    knobUartSendString(command);
 #endif
 }
 

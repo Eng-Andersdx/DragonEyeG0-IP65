@@ -1,8 +1,6 @@
 #include <gui/lightscreen_screen/LightScreenView.hpp>
-#include "DE_Lite/dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
 #include "math.h"
-
-extern TIM_HandleTypeDef htim1;
 
 LightScreenView::LightScreenView()
 	: lightImageProgressCallback(this, &LightScreenView::LightScreenClickHandler)
@@ -21,7 +19,8 @@ void LightScreenView::setupScreen()
 
     lightImageProgress.setClickAction(lightImageProgressCallback);
 
-    presenter->setAmbientLightRGB(true, true, false);
+//presenter->setAmbientLightRGB(true, true, false);
+    presenter->setAmbientLightRGB(LED_YELLOW);
 
     Unicode::snprintf(lightTextAreaBuffer, LIGHTTEXTAREA_SIZE, "%d", presenter->getBrightness());
 
@@ -44,15 +43,16 @@ void LightScreenView::handleTickEvent()
     LightScreenViewBase::handleTickEvent();
     haptic.update();
 
-    if (isPressed && !longPressTrigerred && !dragged){
-        	pressTicks++;
-           if (pressTicks > 60){
-        	   longPressTrigerred= true;
-        	   isPressed=false;
-        	   application().gotoMenuScreenScreenNoTransition();
-        	   pressTicks=0;
-           }
-         }
+    /* 2026-11-13: long press removed (tap -> key 53 from the touch driver). Previous: */
+//    if (isPressed && !longPressTrigerred && !dragged){
+//        	pressTicks++;
+//           if (pressTicks > 60){
+//        	   longPressTrigerred= true;
+//        	   isPressed=false;
+//        	   application().gotoMenuScreenScreenNoTransition();
+//        	   pressTicks=0;
+//           }
+//         }
 
     // Set the hidden text areas visible on first tick
     if (!lightTextArea.isVisible())
@@ -150,5 +150,6 @@ void LightScreenView::changeBrightness(int change)
 }
 
 void LightScreenView::LightScreenLedOn(){
-	BSP_LED_SetColor(RGB_YELLOW);
+//	BSP_LED_SetColor(RGB_YELLOW);
+	presenter->setAmbientLightRGB(LED_YELLOW);
 }

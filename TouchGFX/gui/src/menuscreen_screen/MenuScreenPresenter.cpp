@@ -27,7 +27,7 @@ int MenuScreenPresenter::getSelectedDemoNumber()
     return model->getSelectedDemoNumber();
 }
 
-void MenuScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)
+void MenuScreenPresenter::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     model->setAmbientLightRGB(red, green, blue);
 }

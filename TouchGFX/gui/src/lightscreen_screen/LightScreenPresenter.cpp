@@ -27,7 +27,8 @@ int LightScreenPresenter::getBrightness()
     return model->getBrightness();
 }
 
-void LightScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)
+//void LightScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)   /* previous (bool) */
+void LightScreenPresenter::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     model->setAmbientLightRGB(red, green, blue);
 }

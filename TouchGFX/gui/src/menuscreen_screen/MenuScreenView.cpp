@@ -1,56 +1,36 @@
 #include <gui/MenuScreen_screen/MenuScreenView.hpp>
 #include <gui/common/MenuItems.hpp>
-#include "DE_Lite/dragoneye_leds.h"
-#include "DE_Lite/de_lite_haptic_sensor.h"
-#include "math.h"
-
-extern TIM_HandleTypeDef htim1;
-
-using namespace touchgfx;
-
+#include <gui/common/LedColors.hpp>
 
 MenuScreenView::MenuScreenView()
-	: longPressTrigerred(false)
-	, accumulatedDy(0)
-	, startX(0.f)
-	, startY(0.f)
-
-
+    : lastItem(-1)
 {
+}
+
+void MenuScreenView::setMenuLed(int index)
+{
+    switch (menuItems[index].titleId)
+    {
+    case T_MENU_TEMPERATURE: presenter->setAmbientLightRGB(LED_RED);    break;
+    case T_MENU_BATTERY:     presenter->setAmbientLightRGB(LED_GREEN);  break;
+    case T_MENU_VOLUME:      presenter->setAmbientLightRGB(LED_BLUE);   break;
+    case T_MENU_GUAGE:       presenter->setAmbientLightRGB(LED_PURPLE); break;
+    case T_MENU_LIGHT:       presenter->setAmbientLightRGB(LED_YELLOW); break;
+    default:                 presenter->setAmbientLightRGB(LED_CYAN);   break;   // Info
+    }
 }
 
 void MenuScreenView::setupScreen()
 {
     MenuScreenViewBase::setupScreen();
 
-    switch(presenter->getSelectedDemoNumber()){
-        	case DEMO_HEAT:
-        		BSP_LED_SetColor(RGB_RED);
-        		break;
-        	case DEMO_BATTERY:
-        		BSP_LED_SetColor(RGB_GREEN);
-        		break;
-        	case DEMO_SOUND:
-        		BSP_LED_SetColor(RGB_BLUE);
-        		break;
-        	case DEMO_GAUGE:
-        		BSP_LED_SetColor(RGB_PURPLE);
-        		break;
-        	case DEMO_LIGHT:
-        		BSP_LED_SetColor(RGB_YELLOW);
-        		break;
-        	default:
-        		BSP_LED_SetColor(RGB_CYAN);
-        		break;
-    }
+    const int sel = presenter->getSelectedDemoNumber();
+    menuScrollWheel.animateToItem(sel, 0);
+    lastItem = sel;
+    setMenuLed(sel);                       // colour on entry, no haptic
 
-    menuScrollWheel.animateToItem(presenter->getSelectedDemoNumber(), 0);
-
-    // Hide the widgets that will animate in when the wheel stops
     titleTextArea.setVisible(false);
     gradientImage.setVisible(false);
-
-    presenter->setAmbientLightRGB(true, true, true);
 }
 
 void MenuScreenView::tearDownScreen()
@@ -61,15 +41,30 @@ void MenuScreenView::tearDownScreen()
 void MenuScreenView::menuScrollWheelUpdateItem(MenuIconCustomContainer& item, int16_t itemIndex)
 {
     // Update the menu elements based on their indicies
-	item.setIndex(itemIndex);
-
+    item.setIndex(itemIndex);
 }
 
 void MenuScreenView::handleTickEvent()
 {
     MenuScreenViewBase::handleTickEvent();
 
-    haptic.update();
+    haptic.update();                       // switches the haptic off after its time
+
+    const int16_t cur = menuScrollWheel.getSelectedItem();
+    if (cur != lastItem && cur >= 0 && cur < menuScrollWheel.getNumberOfItems())
+    {
+        lastItem = cur;
+        setMenuLed(cur);
+        haptic.trigger(100);
+    }
+
+    if (menuScrollWheel.isAnimating() && titleTextArea.isVisible())
+    {
+        titleTextArea.setVisible(false);
+        titleTextArea.invalidate();
+        gradientImage.setVisible(false);
+        gradientImage.invalidate();
+    }
 
     // Detect when menu wheel stops animating to an icon
     if (!menuScrollWheel.isAnimating() && !titleTextArea.isVisible())
@@ -90,76 +85,35 @@ void MenuScreenView::handleTickEvent()
     }
 }
 
-void MenuScreenView::handleClickEvent(const ClickEvent& evt){
-	if(evt.getType() == ClickEvent::PRESSED){
-		startX=evt.getX();
-		startY=evt.getY();
-	}
-	else if (evt.getType() == ClickEvent::RELEASED){
-		float dxTotal=evt.getX()-startX;
-		float dyTotal=evt.getY()-startY;
-		float movement= sqrtf(dxTotal*dxTotal+dyTotal*dyTotal);
-		float dx=evt.getX()-55;
-		float dy=evt.getY()-120;
-		float radius = sqrtf(dx*dx + dy*dy);
-		if(movement < 10.f && radius <=50){
-			enter();
-		}
-	}
-}
-
-
-
-void MenuScreenView::handleDragEvent(const DragEvent& evt){
-		float dy = evt.getDeltaY();
-		accumulatedDy+=dy;
-		const float stepSize = 120.0f;
-		const float triggerPoint = 60.0f;
-
-		while (accumulatedDy > triggerPoint){
-			goLeft();
-			accumulatedDy -= stepSize;
-		}
-		while (accumulatedDy < -triggerPoint)
-		{
-			goRight();
-		    accumulatedDy += stepSize;
-		}
-
-}
+//void MenuScreenView::handleClickEvent(const ClickEvent& event)
+//{
+//    /* 2026-11-13: tap-enter now comes from the touch driver as key 53 (Interaction "enter").
+//     * Entering here too would enter twice and bounce back. Previous code kept below. */
+////    MenuScreenViewBase::handleClickEvent(event);
+////    return;
+//
+////    if (event.getType() == touchgfx::ClickEvent::ClickEventType::RELEASED
+////    		&&
+////            !menuScrollWheel.isAnimating() &&
+////            event.getY() >= 20 &&
+////            event.getY() < 224)
+////    {
+////        // Enter sub demo, when the menu is standing still and the selected icon is clicked
+////        enter();
+////    }
+////    else
+////    {
+//        // Otherwise, propagate the click event to the default handling
+//        MenuScreenViewBase::handleClickEvent(event);
+////    }
+//}
 
 void MenuScreenView::rollMenu(int16_t change)
 {
     // Animate the menu wheel to a new position, if it is valid
     int newIndex = menuScrollWheel.getSelectedItem() + change;
-    if (newIndex >= 0 && newIndex < menuScrollWheel.getNumberOfItems()){
-    	switch(menuItems[newIndex].iconId){
-    	case BITMAP_HEAT_MENU_ICON_ID:
-    		BSP_LED_SetColor(RGB_RED);
-    		haptic.trigger(100);
-    		break;
-    	case BITMAP_BATTERY_MENU_ICON_ID:
-    		BSP_LED_SetColor(RGB_GREEN);
-    		haptic.trigger(100);
-    		break;
-    	case BITMAP_SOUND_MENU_ICON_ID:
-    		BSP_LED_SetColor(RGB_BLUE);
-    		haptic.trigger(100);
-    		break;
-    	case BITMAP_GAUGE_MENU_ICON_ID:
-    		BSP_LED_SetColor(RGB_PURPLE);
-    		haptic.trigger(100);
-    		break;
-    	case BITMAP_LIGHT_MENU_ICON_ID:
-    		BSP_LED_SetColor(RGB_YELLOW);
-    		haptic.trigger(100);
-    		break;
-    	default:
-    		BSP_LED_SetColor(RGB_CYAN);
-    		haptic.trigger(100);
-    		break;
-    	}
-
+    if (newIndex >= 0 && newIndex < menuScrollWheel.getNumberOfItems())
+    {
         menuScrollWheel.animateToItem(newIndex, 20);
 
         // Hide the title and color gradient during the menu animation
@@ -170,20 +124,21 @@ void MenuScreenView::rollMenu(int16_t change)
     }
 }
 
-void MenuScreenView::goRight()
+void MenuScreenView::scrollDown()
 {
     rollMenu(1);
 }
 
-void MenuScreenView::goLeft()
+void MenuScreenView::scrollUp()
 {
-   rollMenu(-1);
+    rollMenu(-1);
 }
 
 void MenuScreenView::enter()
 {
     // Update the parameter in the model, to be able to start at the same position when returning to the menu
     presenter->setSelectedDemoNumber(menuScrollWheel.getSelectedItem());
+
     // Use the text for the selected icon to determine which screen to switch to
     switch (menuItems[menuScrollWheel.getSelectedItem()].titleId)
     {
@@ -197,7 +152,7 @@ void MenuScreenView::enter()
         goToVolume();
         break;
     case T_MENU_GUAGE:
-        goToSpeed();
+        goToGauge();
         break;
     case T_MENU_LIGHT:
         goToLight();
@@ -208,8 +163,4 @@ void MenuScreenView::enter()
     default:
         break;
     }
-}
-
-void MenuScreenView::MainMenuLedOn(){
-	BSP_LED_SetColor(RGB_GREEN);
 }

@@ -30,7 +30,8 @@ public:
     void setTemperature(int value);
     int getTemperature();
 
-    void setAmbientLightRGB(bool red, bool green, bool blue);
+//  void setAmbientLightRGB(bool red, bool green, bool blue);   /* previous (bool) */
+    void setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue);   /* 0..255, see LedColors.hpp */
 
 private:
     TemperatureScreenPresenter();

@@ -25,15 +25,6 @@
       </Text>
     </TextGroup>
     <TextGroup Id="Unsorted">
-      <Text Id="__SingleUse_338Z" Alignment="Left" TypographyId="MenuTitles">
-        <Translation Language="GB">RAM:&#10;Flash:&#10;SPI Flash:</Translation>
-      </Text>
-      <Text Id="__SingleUse_U8VH" Alignment="Right" TypographyId="MenuTitles">
-        <Translation Language="GB">16.9 / 144 KB&#10;124.9 / 128 KB&#10;1.5 / 8 MB</Translation>
-      </Text>
-      <Text Id="__SingleUse_YHC7" Alignment="Left" TypographyId="MenuTitles">
-        <Translation Language="GB">Memory</Translation>
-      </Text>
       <Text Id="default_2digits" Alignment="Left" TypographyId="BigNumbers">
         <Translation Language="GB">00</Translation>
       </Text>
@@ -42,6 +33,24 @@
       </Text>
       <Text Id="default_3digits" Alignment="Left" TypographyId="BigNumbers">
         <Translation Language="GB">100</Translation>
+      </Text>
+      <Text Id="__SingleUse_WHZU" Alignment="Center" TypographyId="MenuTitles">
+        <Translation Language="GB">Usage of this&#10;demo on STM32C091:</Translation>
+      </Text>
+      <Text Id="__SingleUse_11UD" Alignment="Right" TypographyId="MenuTitles">
+        <Translation Language="GB">18 / 36 KB&#10;131 / 256 KB&#10;1.4 / 8 MB</Translation>
+      </Text>
+      <Text Id="__SingleUse_5JHD" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">RAM:&#10;Flash:&#10;SPI Flash:</Translation>
+      </Text>
+      <Text Id="__SingleUse_IOKJ" Alignment="Center" TypographyId="MenuTitles">
+        <Translation Language="GB">This Entry-level&#10;GFX demo targets&#10;SPI displays run by&#10;e.g. STM32C0 using&#10;partial framebuffer</Translation>
+      </Text>
+      <Text Id="__SingleUse_XJ9G" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">Memory</Translation>
+      </Text>
+      <Text Id="__SingleUse_30F3" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">Demo info</Translation>
       </Text>
       <Text Id="__SingleUse_6RMJ" Alignment="Left" TypographyId="Units">
         <Translation Language="GB">bar</Translation>
@@ -55,12 +64,20 @@
       <Text Id="TemperatureTitleText" Alignment="Center" TypographyId="BigNumbers">
         <Translation Language="GB">Temperature</Translation>
       </Text>
+      <Text Id="__SingleUse_338Z" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">RAM:&#10;Flash:&#10;SPI Flash:</Translation>
+      </Text>
+      <Text Id="__SingleUse_U8VH" Alignment="Right" TypographyId="MenuTitles">
+        <Translation Language="GB">16.9 / 144 KB&#10;124.9 / 128 KB&#10;1.5 / 8 MB</Translation>
+      </Text>
+      <Text Id="__SingleUse_YHC7" Alignment="Left" TypographyId="MenuTitles">
+        <Translation Language="GB">Memory</Translation>
+      </Text>
     </TextGroup>
   </Texts>
   <Typographies>
     <Typography Id="MenuTitles" Font="SairaSemiCondensed-Bold.ttf" Size="24" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="BigNumbers" Font="ShareTechMono-Regular.ttf" Size="100" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
     <Typography Id="Units" Font="SairaSemiCondensed-Bold.ttf" Size="36" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
-    <Typography Id="Typography_00" Font="verdana.ttf" Size="15" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
   </Typographies>
 </TextDatabase>

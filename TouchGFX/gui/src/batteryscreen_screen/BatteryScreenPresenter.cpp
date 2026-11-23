@@ -22,7 +22,8 @@ uint16_t BatteryScreenPresenter::getBatteryLevel()
     return model->getBatteryLevel();
 }
 
-void BatteryScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)
+//void BatteryScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)   /* previous (bool) */
+void BatteryScreenPresenter::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     model->setAmbientLightRGB(red, green, blue);
 }

@@ -27,6 +27,8 @@ public:
 
     virtual ~DELiteSplashScreenPresenter() {}
 
+    void setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue);   /* 0..255, see LedColors.hpp */
+
 private:
     DELiteSplashScreenPresenter();
 

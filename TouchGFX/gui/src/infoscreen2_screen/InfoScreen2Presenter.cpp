@@ -16,3 +16,8 @@ void InfoScreen2Presenter::deactivate()
 {
 
 }
+
+void InfoScreen2Presenter::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
+{
+    model->setAmbientLightRGB(red, green, blue);
+}

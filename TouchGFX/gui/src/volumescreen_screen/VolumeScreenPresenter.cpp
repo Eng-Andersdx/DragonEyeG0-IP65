@@ -27,7 +27,8 @@ int VolumeScreenPresenter::getVolume()
     return model->getVolume();
 }
 
-void VolumeScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)
+//void VolumeScreenPresenter::setAmbientLightRGB(bool red, bool green, bool blue)   /* previous (bool) */
+void VolumeScreenPresenter::setAmbientLightRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
     model->setAmbientLightRGB(red, green, blue);
 }

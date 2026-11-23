@@ -17,3 +17,8 @@ void MenuIconCustomContainer::setIndex(int16_t index)
     iconImage.setBitmap(menuItems[index].iconId);
     iconImage.invalidate();
 }
+
+void MenuIconCustomContainer::invalidateContent(void) const
+{
+    iconImage.invalidate();
+}

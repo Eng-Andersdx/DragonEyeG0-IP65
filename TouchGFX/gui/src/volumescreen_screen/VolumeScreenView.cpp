@@ -1,8 +1,6 @@
 #include <gui/volumescreen_screen/VolumeScreenView.hpp>
-#include "dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
 #include "math.h"
-
-extern TIM_HandleTypeDef htim1;
 
 using namespace touchgfx;
 
@@ -33,7 +31,8 @@ void VolumeScreenView::setupScreen()
 
     circleProgress.setClickAction(volumeImageProgressCallback);
 
-    presenter->setAmbientLightRGB(false, false, true);
+//presenter->setAmbientLightRGB(false, false, true);
+    presenter->setAmbientLightRGB(LED_BLUE);
 
     bigNumberCustomContainer1.updateValue(presenter->getVolume());
 
@@ -56,15 +55,16 @@ void VolumeScreenView::handleTickEvent()
 
     haptic.update();
 
-    if (isPressed && !longPressTrigerred && !dragged){
-       	pressTicks++;
-          if (pressTicks > 60){
-       	   longPressTrigerred=true;
-       	   isPressed=false;
-       	   application().gotoMenuScreenScreenNoTransition();
-       	   pressTicks=0;
-          }
-    }
+    /* 2026-11-13: long press removed (tap -> key 53 from the touch driver). Previous: */
+//    if (isPressed && !longPressTrigerred && !dragged){
+//       	pressTicks++;
+//          if (pressTicks > 60){
+//       	   longPressTrigerred=true;
+//       	   isPressed=false;
+//       	   application().gotoMenuScreenScreenNoTransition();
+//       	   pressTicks=0;
+//          }
+//    }
 
     // Set the big number text area visble on first tick
     if (!bigNumberCustomContainer1.isVisible())
@@ -197,6 +197,7 @@ void VolumeScreenView::changeVolume(int change)
 }
 
 void VolumeScreenView::VolumeScreenLedOn(){
-	BSP_LED_SetColor(RGB_BLUE);
+//	BSP_LED_SetColor(RGB_BLUE);
+	presenter->setAmbientLightRGB(LED_BLUE);
 
 }

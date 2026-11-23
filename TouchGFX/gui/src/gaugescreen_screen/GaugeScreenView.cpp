@@ -1,8 +1,6 @@
 #include <gui/gaugescreen_screen/GaugeScreenView.hpp>
-#include "DE_Lite/dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
 #include "math.h"
-
-extern TIM_HandleTypeDef htim1;
 
 using namespace touchgfx;
 
@@ -33,7 +31,8 @@ void GaugeScreenView::setupScreen()
 
     backgroundImage.setClickAction(guageImageProgressCallback);
 
-    presenter->setAmbientLightRGB(true, false, true);
+//presenter->setAmbientLightRGB(true, false, true);
+    presenter->setAmbientLightRGB(LED_PURPLE);
 
     bigNumberCustomContainer1.updateValue(presenter->getPressure());
 
@@ -56,15 +55,16 @@ void GaugeScreenView::handleTickEvent()
 
     haptic.update();
 
-    if (isPressed && !longPressTrigerred && !dragged){
-          	pressTicks++;
-             if (pressTicks > 60){
-          	   longPressTrigerred= true;
-          	   isPressed=false;
-          	   application().gotoMenuScreenScreenNoTransition();
-          	   pressTicks=0;
-             }
-           }
+    /* 2026-11-13: long press removed (tap -> key 53 from the touch driver). Previous: */
+//    if (isPressed && !longPressTrigerred && !dragged){
+//          	pressTicks++;
+//             if (pressTicks > 60){
+//          	   longPressTrigerred= true;
+//          	   isPressed=false;
+//          	   application().gotoMenuScreenScreenNoTransition();
+//          	   pressTicks=0;
+//             }
+//           }
 
     // Set the big number text area visible on the first tick
     if (!bigNumberCustomContainer1.isVisible())
@@ -206,5 +206,6 @@ void GaugeScreenView::moveNeedleToPostion(uint16_t position)
 }
 
 void GaugeScreenView::GuageMenuLedOn(){
-	BSP_LED_SetColor(RGB_PURPLE);
+//	BSP_LED_SetColor(RGB_PURPLE);
+	presenter->setAmbientLightRGB(LED_PURPLE);
 }

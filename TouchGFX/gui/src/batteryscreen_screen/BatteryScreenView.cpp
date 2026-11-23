@@ -1,11 +1,16 @@
 #include <gui/batteryscreen_screen/BatteryScreenView.hpp>
-#include "DE_Lite/dragoneye_leds.h"
+//#include "DE_Lite/dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
+#include <stdlib.h>   /* abs() for tap/drag detection */
 
 BatteryScreenView::BatteryScreenView()
 	: batteryImageCallback(this, &BatteryScreenView::BatteryScreenClickHandler)
 	, pressTicks(0)
 	, isPressed(false)
 	, longPressTrigerred(false)
+	, tapStartX(0)
+	, tapStartY(0)
+	, tapMoved(true)
 {
 
 }
@@ -16,7 +21,8 @@ void BatteryScreenView::setupScreen()
 
     fillBox.setClickAction(batteryImageCallback);
 
-    presenter->setAmbientLightRGB(false, true, false);
+//presenter->setAmbientLightRGB(false, true, false);
+    presenter->setAmbientLightRGB(LED_GREEN);
 
     updateBatteryIndicator();
 
@@ -38,15 +44,16 @@ void BatteryScreenView::handleTickEvent()
 //    if(handleLongPressLogic(pressTicks, isPressed, longPressTrigerred)){
 //    	application().gotoMenuScreenScreenNoTransition();
 //    }
-    if (isPressed && !longPressTrigerred){
-           	pressTicks++;
-              if (pressTicks > 60){
-           	   longPressTrigerred= true;
-           	   isPressed=false;
-           	   application().gotoMenuScreenScreenNoTransition();
-           	   pressTicks=0;
-              }
-            }
+    /* 2026-11-13: long press removed (tap -> key 53 from the touch driver). Previous: */
+//    if (isPressed && !longPressTrigerred){
+//           	pressTicks++;
+//              if (pressTicks > 60){
+//           	   longPressTrigerred= true;
+//           	   isPressed=false;
+//           	   application().gotoMenuScreenScreenNoTransition();
+//           	   pressTicks=0;
+//              }
+//            }
 
 
     // Set the hidden widgets visible on the first tick
@@ -81,6 +88,34 @@ void BatteryScreenView::BatteryScreenClickHandler(const Box& batteryImage, const
 }
 
 
+
+void BatteryScreenView::handleClickEvent(const ClickEvent& evt)
+{
+    BatteryScreenViewBase::handleClickEvent(evt);
+
+    if (evt.getType() == ClickEvent::PRESSED)
+    {
+        tapStartX = evt.getX();
+        tapStartY = evt.getY();
+        tapMoved  = false;
+    }
+    else if (evt.getType() == ClickEvent::RELEASED && !tapMoved)
+    {
+        tapMoved = true;
+//      handleKeyEvent(53);   /* 2026-11-13: tap -> key 53 now comes from the touch driver */
+    }
+}
+
+void BatteryScreenView::handleDragEvent(const DragEvent& evt)
+{
+    BatteryScreenViewBase::handleDragEvent(evt);
+
+    if (abs(evt.getNewX() - tapStartX) > 5 || abs(evt.getNewY() - tapStartY) > 5)
+    {
+        tapMoved = true;          /* it's a drag, not a tap */
+    }
+}
+
 void BatteryScreenView::updateBatteryIndicator()
 {
     const uint16_t newBatteryLevel = presenter->getBatteryLevel();
@@ -109,6 +144,7 @@ void BatteryScreenView::updateBatteryIndicator()
 }
 
 void BatteryScreenView::ChargeMenuLedOn(){
-	void BSP_LED_AllOff();
-	BSP_LED_SetColor(RGB_GREEN);
+//	void BSP_LED_AllOff();
+//	BSP_LED_SetColor(RGB_GREEN);
+	presenter->setAmbientLightRGB(LED_GREEN);
 }

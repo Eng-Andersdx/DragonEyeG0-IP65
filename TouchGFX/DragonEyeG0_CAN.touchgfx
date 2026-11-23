@@ -72,14 +72,13 @@
           {
             "Type": "ScrollWheel",
             "Name": "menuScrollWheel",
-            "X": 18,
-            "Width": 80,
+            "Width": 240,
             "Height": 240,
-            "SelectedItemOffset": 55,
+            "SelectedItemOffset": 59,
             "ItemTemplateName": "MenuIconCustomContainer",
             "NumberofItems": 6,
             "InitialElement": 1,
-            "ItemMargin": 25,
+            "ItemMargin": 23,
             "Easing": "Back",
             "EasingOption": "Out",
             "SwipeAcceleration": 1.0,
@@ -92,7 +91,7 @@
             "X": 184,
             "Width": 56,
             "Height": 240,
-            "RelativeFilename": "battery_menu_gradient.png",
+            "RelativeFilename": "menu_gradient_battery.png",
             "Moveable": true
           },
           {
@@ -114,29 +113,29 @@
         ],
         "Interactions": [
           {
-            "InteractionName": "Interaction1",
+            "InteractionName": "Hardware_Button_Down",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 54
+              "ButtonKey": 50
             },
             "Action": {
               "Type": "ActionCustom",
-              "FunctionName": "goRight"
+              "FunctionName": "scrollDown"
             }
           },
           {
-            "InteractionName": "Interaction2",
+            "InteractionName": "Hardware_Button_Left",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
               "ButtonKey": 52
             },
             "Action": {
               "Type": "ActionCustom",
-              "FunctionName": "goLeft"
+              "FunctionName": "scrollUp"
             }
           },
           {
-            "InteractionName": "Interaction3",
+            "InteractionName": "Hardware_Button_Enter",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
               "ButtonKey": 53
@@ -147,7 +146,29 @@
             }
           },
           {
-            "InteractionName": "Interaction4",
+            "InteractionName": "Hardware_Button_Right",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 54
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "scrollDown"
+            }
+          },
+          {
+            "InteractionName": "Hardware_Button_Up",
+            "Trigger": {
+              "Type": "TriggerPhysicalButtonClicked",
+              "ButtonKey": 56
+            },
+            "Action": {
+              "Type": "ActionCustom",
+              "FunctionName": "scrollUp"
+            }
+          },
+          {
+            "InteractionName": "Open_Battery_Screen",
             "Trigger": {
               "Type": "TriggerWhen",
               "ActionCustomTypeName": "Call MenuScreen goToBattery"
@@ -159,7 +180,7 @@
             }
           },
           {
-            "InteractionName": "Interaction5",
+            "InteractionName": "Open_Volume_Screen",
             "Trigger": {
               "Type": "TriggerWhen",
               "ActionCustomTypeName": "Call MenuScreen goToVolume"
@@ -171,7 +192,7 @@
             }
           },
           {
-            "InteractionName": "Interaction6",
+            "InteractionName": "Open_Light_Screen",
             "Trigger": {
               "Type": "TriggerWhen",
               "ActionCustomTypeName": "Call MenuScreen goToLight"
@@ -183,7 +204,7 @@
             }
           },
           {
-            "InteractionName": "Interaction7",
+            "InteractionName": "Open_Temperature_Screen",
             "Trigger": {
               "Type": "TriggerWhen",
               "ActionCustomTypeName": "Call MenuScreen goToTemperature"
@@ -195,10 +216,10 @@
             }
           },
           {
-            "InteractionName": "Interaction8",
+            "InteractionName": "Open_Gauge_Screen",
             "Trigger": {
               "Type": "TriggerWhen",
-              "ActionCustomTypeName": "Call MenuScreen goToSpeed"
+              "ActionCustomTypeName": "Call MenuScreen goToGauge"
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -207,7 +228,7 @@
             }
           },
           {
-            "InteractionName": "Interaction9",
+            "InteractionName": "Open_Info_Screen",
             "Trigger": {
               "Type": "TriggerWhen",
               "ActionCustomTypeName": "Call MenuScreen goToInfo"
@@ -216,16 +237,6 @@
               "Type": "ActionGotoScreen",
               "ScreenTransitionType": "ScreenTransitionNone",
               "ActionComponent": "InfoScreen2"
-            }
-          },
-          {
-            "InteractionName": "Interaction10",
-            "Trigger": {
-              "Type": "TriggerScreenTransitionBegins"
-            },
-            "Action": {
-              "Type": "ActionCustom",
-              "FunctionName": "MainMenuLedOn"
             }
           }
         ],
@@ -240,7 +251,7 @@
             "Name": "goToTemperature"
           },
           {
-            "Name": "goToSpeed"
+            "Name": "goToGauge"
           },
           {
             "Name": "goToBattery"
@@ -301,7 +312,7 @@
             "InteractionName": "Interaction1",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 3
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -437,7 +448,7 @@
             "InteractionName": "Interaction1",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 3
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -512,6 +523,44 @@
             "Width": 90,
             "Height": 70,
             "CustomContainerDefinitionName": "BigNumberCustomContainer"
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "flexButton1",
+            "X": 56,
+            "Y": 73,
+            "Width": 129,
+            "Height": 97,
+            "Alpha": 0,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Width": 129,
+                "Height": 97,
+                "LockToFlexButtonSize": true,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
           }
         ],
         "Interactions": [
@@ -519,7 +568,7 @@
             "InteractionName": "Interaction1",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 3
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -557,6 +606,18 @@
             "Action": {
               "Type": "ActionCustom",
               "FunctionName": "VolumeScreenLedOn"
+            }
+          },
+          {
+            "InteractionName": "Interaction5",
+            "Trigger": {
+              "Type": "TriggerClicked",
+              "TriggerComponent": "flexButton1"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "MenuScreen"
             }
           }
         ]
@@ -622,7 +683,7 @@
             "InteractionName": "Interaction1",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 3
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -714,7 +775,7 @@
             "InteractionName": "BackToMenu",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 3
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -838,7 +899,7 @@
             "InteractionName": "BackToMenu",
             "Trigger": {
               "Type": "TriggerPhysicalButtonClicked",
-              "ButtonKey": 3
+              "ButtonKey": 53
             },
             "Action": {
               "Type": "ActionGotoScreen",
@@ -862,15 +923,16 @@
     "CustomContainerDefinitions": [
       {
         "Name": "MenuIconCustomContainer",
-        "Width": 80,
+        "Width": 240,
         "Height": 80,
         "Components": [
           {
             "Type": "Image",
             "Name": "iconImage",
+            "X": 20,
             "Width": 80,
             "Height": 80,
-            "RelativeFilename": "battery_menu_icon.png"
+            "RelativeFilename": "menu_icon_battery.png"
           }
         ],
         "Interactions": [

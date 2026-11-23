@@ -1,7 +1,9 @@
 #include <gui/delitesplashscreen_screen/DELiteSplashScreenView.hpp>
-#include "DE_Lite/dragoneye_leds.h"
+#include <gui/common/LedColors.hpp>      /* 2026-11-23: LED colours via presenter, no BSP include */
 
-extern TIM_HandleTypeDef htim1;
+#ifdef KNOB_INTERFACE
+#include "knob_interface.hpp"
+#endif
 
 DELiteSplashScreenView::DELiteSplashScreenView()
 {
@@ -19,11 +21,11 @@ void DELiteSplashScreenView::tearDownScreen()
 }
 
 void DELiteSplashScreenView::WhiteLedOn(){
-	BSP_LED_PWM_Init(&htim1, TIM_CHANNEL_4, TIM_CHANNEL_3, TIM_CHANNEL_2);
-	BSP_LED_SetColor(RGB_WHITE);
+	presenter->setAmbientLightRGB(LED_WHITE);
 }
 
 void DELiteSplashScreenView::backlightIntensityControl(){
-	BSP_BL_PWM_Init(&htim1, TIM_CHANNEL_1);
-	BSP_BL_SetIntensity(100);
+#ifdef KNOB_INTERFACE
+	knobSetBacklight(100);
+#endif
 }

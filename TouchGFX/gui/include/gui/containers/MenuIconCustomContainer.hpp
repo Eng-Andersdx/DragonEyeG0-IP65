@@ -11,6 +11,7 @@ public:
     virtual void initialize();
 
     void setIndex(int16_t index);
+    void invalidateContent(void) const;
 
 protected:
 };
