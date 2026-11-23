@@ -665,11 +665,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : HALL_S2_Pin HALL_S1_Pin */
-  GPIO_InitStruct.Pin = HALL_S2_Pin|HALL_S1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  /*Configure GPIO pin : HALL_S1_Pin */
+  GPIO_InitStruct.Pin = HALL_S1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(HALL_S1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : HALL_S2_Pin */
+  GPIO_InitStruct.Pin = HALL_S2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(HALL_S2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DISPLAY_CSX_Pin DISPLAY_DCX_Pin */
   GPIO_InitStruct.Pin = DISPLAY_CSX_Pin|DISPLAY_DCX_Pin;
@@ -680,7 +686,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : CTP_INT_Pin */
   GPIO_InitStruct.Pin = CTP_INT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(CTP_INT_GPIO_Port, &GPIO_InitStruct);
 
@@ -715,7 +721,7 @@ static void MX_GPIO_Init(void)
   __HAL_SYSCFG_FASTMODEPLUS_ENABLE(SYSCFG_FASTMODEPLUS_PB6);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI0_1_IRQn, 3, 0);
   HAL_NVIC_EnableIRQ(EXTI0_1_IRQn);
 
   HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0);
