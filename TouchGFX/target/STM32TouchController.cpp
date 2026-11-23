@@ -30,6 +30,12 @@
  * 1.3	   | 2026-25-08 | H.Hunain  | Backwards compatibility fixed for product range
  * 1.4     | 2026-11-02 | H.Hunain  | Added st1x33i_800x480 for the 5" DEU5_5R (800x480)
  * 1.5     | 2026-11-04 | R.Gopan   | Removed stm32u5xx_hal.h from the header
+ * 1.6     | 2026-11-20 | R.Gopan   | Added DragonEyeH5 and DragonEyeG0 support
+ * -----------------------------------------------------------------------------
+ * Product selection (bsp.h):
+ *   DragonEye2.0 : #define DEU5_2_1R   + #define st1x33i_240x240/480x480/360x360/800x480  (STM32U5, hi2c5)
+ *   1.3" G0      : #define DragonEyeG0 + #define st1x33i_240x240/480x480/360x360/800x480  (STM32G0, hi2c2)
+ *   1.8" H5      : #define DragonEyeH5 + #define st1x33i_240x240/480x480/360x360/800x480  (STM32H5, bit-banged I2C on PB3/PB4)
  * -----------------------------------------------------------------------------
  * Notes:
  * - Always increment version when making manual changes.
@@ -41,21 +47,239 @@
 /* USER CODE BEGIN STM32TouchController */
 #include <STM32TouchController.hpp>
 #include "main.h"
-#include"bsp.h"
+#include "bsp.h"
 #include "math.h"
 
-#if __TOUCH_CONTROLLER_HPP != 0105	/* BSP Touch REVISION v.1.5 */
+#if __TOUCH_CONTROLLER_HPP != 0106	/* BSP Touch REVISION v.1.7 */
 #error Wrong API version file (STM32TouchController.hpp).
+#endif
+
+#if defined(DEU5_2_1R) && (defined(DragonEyeG0) || defined(DragonEyeH5))
+#error "bsp.h: define only one of DEU5_2_1R (DragonEye2.0) / DragonEyeG0 (1.3in G0) / DragonEyeH5 (1.8in H5)"
+#endif
+
+#ifdef DragonEyeH5
+/* ===================== 1.8" H5: touch bus =====================
+ * The ST1633 is on PB3 (SCL) / PB4 (SDA). On the H5 these pins belong to I3C2 (CubeMX) and the project has no
+ * HAL I2C module.
+ * H5 reads the chip with a bit-banged (software) I2C master on the same pins, which waits for clock
+ * stretching like a hardware I2C.
+ * Used by the DragonEyeH5 versions of TS_IO_Write / TS_IO_Read / TS_IO_ReadMultiple further down. */
+/* ---------------------------------------------------------------- */
+#define TS_SCL_PORT        GPIOB
+#define TS_SCL_PIN         GPIO_PIN_3
+#define TS_SDA_PORT        GPIOB
+#define TS_SDA_PIN         GPIO_PIN_4
+#define TS_I2C_HALF_US     5U        /* half clock period: 5 us = 100 kHz        */
+#define TS_I2C_STRETCH_US  2000U     /* longest time the chip may hold SCL low   */
+
+#ifdef HAL_I3C_MODULE_ENABLED
+extern I3C_HandleTypeDef hi3c2;      /* CubeMX set PB3 / PB4 up for I3C2; released in ts_softInit() */
+#endif
+
+static bool     ts_softReady   = false;
+static uint32_t ts_cyclesPerUs = 1U;
+
+static void ts_delayUs(uint32_t us)
+{
+	const uint32_t start = DWT->CYCCNT;
+	const uint32_t n = us * ts_cyclesPerUs;
+	while ((DWT->CYCCNT - start) < n) { }
+}
+
+static inline void ts_sclLow(void)  { TS_SCL_PORT->BRR  = TS_SCL_PIN; }
+static inline void ts_sdaLow(void)  { TS_SDA_PORT->BRR  = TS_SDA_PIN; }
+static inline void ts_sdaRel(void)  { TS_SDA_PORT->BSRR = TS_SDA_PIN; }      /* open-drain: release = high */
+static inline bool ts_sda(void)     { return (TS_SDA_PORT->IDR & TS_SDA_PIN) != 0U; }
+
+/* release SCL, wait while the chip stretches it, then hold the high time */
+static bool ts_sclHigh(void)
+{
+	TS_SCL_PORT->BSRR = TS_SCL_PIN;
+	const uint32_t start = DWT->CYCCNT;
+	const uint32_t n = TS_I2C_STRETCH_US * ts_cyclesPerUs;
+	while ((TS_SCL_PORT->IDR & TS_SCL_PIN) == 0U) {
+		if ((DWT->CYCCNT - start) > n) {
+			return false;
+		}
+	}
+	ts_delayUs(TS_I2C_HALF_US);
+	return true;
+}
+
+static bool ts_start(void)          /* also used as repeated start (SCL is low then) */
+{
+	ts_sdaRel();
+	ts_delayUs(TS_I2C_HALF_US);
+	if (!ts_sclHigh()) {
+		return false;
+	}
+	ts_sdaLow();
+	ts_delayUs(TS_I2C_HALF_US);
+	ts_sclLow();
+	ts_delayUs(TS_I2C_HALF_US);
+	return true;
+}
+
+static void ts_stop(void)
+{
+	ts_sdaLow();
+	ts_delayUs(TS_I2C_HALF_US);
+	(void)ts_sclHigh();
+	ts_sdaRel();
+	ts_delayUs(TS_I2C_HALF_US);
+}
+
+static bool ts_writeByte(uint8_t b)  /* true = ACK */
+{
+	for (uint8_t i = 0; i < 8U; i++) {
+		if (b & 0x80U) { ts_sdaRel(); } else { ts_sdaLow(); }
+		b <<= 1;
+		ts_delayUs(TS_I2C_HALF_US);
+		if (!ts_sclHigh()) {
+			return false;
+		}
+		ts_sclLow();
+	}
+	ts_sdaRel();
+	ts_delayUs(TS_I2C_HALF_US);
+	if (!ts_sclHigh()) {
+		return false;
+	}
+	const bool ack = !ts_sda();
+	ts_sclLow();
+	return ack;
+}
+
+static bool ts_readByte(uint8_t *b, bool ack)
+{
+	uint8_t v = 0;
+	ts_sdaRel();
+	for (uint8_t i = 0; i < 8U; i++) {
+		ts_delayUs(TS_I2C_HALF_US);
+		if (!ts_sclHigh()) {
+			return false;
+		}
+		v = (uint8_t)((v << 1) | (ts_sda() ? 1U : 0U));
+		ts_sclLow();
+	}
+	if (ack) { ts_sdaLow(); } else { ts_sdaRel(); }
+	ts_delayUs(TS_I2C_HALF_US);
+	if (!ts_sclHigh()) {
+		return false;
+	}
+	ts_sclLow();
+	ts_sdaRel();
+	*b = v;
+	return true;
+}
+
+/* free the bus if the chip was left holding SDA (e.g. after a reset in the middle of a read) */
+static void ts_busClear(void)
+{
+	for (uint8_t i = 0; i < 9U && !ts_sda(); i++) {
+		ts_sclLow();
+		ts_delayUs(TS_I2C_HALF_US);
+		(void)ts_sclHigh();
+	}
+	ts_stop();
+}
+
+/* first use: release PB3 / PB4 from I3C2 and make them open-drain GPIOs */
+static void ts_softInit(void)
+{
+	GPIO_InitTypeDef g = {0};
+
+#ifdef HAL_I3C_MODULE_ENABLED
+	(void)HAL_I3C_DeInit(&hi3c2);
+#endif
+
+	DCB->DEMCR |= DCB_DEMCR_TRCENA_Msk;
+	DWT->CTRL  |= DWT_CTRL_CYCCNTENA_Msk;
+	ts_cyclesPerUs = SystemCoreClock / 1000000U;
+	if (ts_cyclesPerUs == 0U) {
+		ts_cyclesPerUs = 1U;
+	}
+
+	TS_SCL_PORT->BSRR = TS_SCL_PIN;
+	TS_SDA_PORT->BSRR = TS_SDA_PIN;
+	g.Mode  = GPIO_MODE_OUTPUT_OD;
+	g.Pull  = GPIO_PULLUP;
+	g.Speed = GPIO_SPEED_FREQ_LOW;
+	g.Pin   = TS_SCL_PIN;
+	HAL_GPIO_Init(TS_SCL_PORT, &g);
+	g.Pin   = TS_SDA_PIN;
+	HAL_GPIO_Init(TS_SDA_PORT, &g);
+
+	ts_busClear();
+	ts_softReady = true;
+}
+
+/* Addr = 8-bit address (I2C_Address = ST1633I_ADD_REG<<1). Returns HAL_OK / HAL_ERROR, never hangs. */
+static HAL_StatusTypeDef TS_SOFT_MemWrite(uint16_t Addr, uint16_t Reg, uint8_t *pData, uint16_t Size)
+{
+	if (!ts_softReady) {
+		ts_softInit();
+	}
+	bool ok = ts_start() && ts_writeByte((uint8_t)(Addr & 0xFEU)) && ts_writeByte((uint8_t)Reg);
+	for (uint16_t i = 0; ok && i < Size; i++) {
+		ok = ts_writeByte(pData[i]);
+	}
+	ts_stop();
+	if (!ok) {
+		ts_busClear();
+	}
+	return ok ? HAL_OK : HAL_ERROR;
+}
+
+static HAL_StatusTypeDef TS_SOFT_MemRead(uint16_t Addr, uint16_t Reg, uint8_t *pData, uint16_t Size)
+{
+	if (!ts_softReady) {
+		ts_softInit();
+	}
+	bool ok = ts_start() && ts_writeByte((uint8_t)(Addr & 0xFEU)) && ts_writeByte((uint8_t)Reg)
+	          && ts_start() && ts_writeByte((uint8_t)(Addr | 0x01U));
+	for (uint16_t i = 0; ok && i < Size; i++) {
+		ok = ts_readByte(&pData[i], (i + 1U) < Size);
+	}
+	ts_stop();
+	if (!ok) {
+		ts_busClear();
+	}
+	return ok ? HAL_OK : HAL_ERROR;
+}
+
+#endif /* DragonEyeH5 */
+
+/* ---- I2C bus of the touch chip, per product ---- */
+#if defined(DEU5_2_1R) || defined(DATAIMAGE_MICROCHIP_TOUCH_IC)
+extern I2C_HandleTypeDef hi2c5;
+#endif
+#ifdef DEU5_2_1R
+#define TS_I2C_HANDLE   hi2c5             /* DragonEye2.0 */
+#elif defined(DragonEyeH5)
+/* 1.8" H5: no I2C handle, the touch chip is read with the bit-banged I2C (DragonEyeH5 touch bus above) */
+#else
+extern I2C_HandleTypeDef hi2c2;
+#define TS_I2C_HANDLE   hi2c2             /* 1.3" G0 and other G0-style products */
 #endif
 
 static bool TS_initialized = false;
 volatile uint8_t Touch_Event_Flag = 0;
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
+#if defined(st1x33i_240x240) || defined(st1x33i_360x360) || defined(st1x33i_480x480) || defined(st1x33i_800x480)/* any ST1633i: st1x33i, st1x33i_240x240/480x480/800x480 */
 static TS_StateTypeDef  TS_State = {0};
 touch_data_t ST_1633ITouchData;
 uint8_t  I2C_Address = ST1633I_ADD_REG<<1;
 uint8_t cord[3]={0};
+
+
+#endif
+
+#if defined(DragonEyeG0) || defined(DragonEyeH5)
+extern uint8_t ui8EncoderPushed;
+static bool    fingerDown = false;
+static bool    touchMoved = false;
 #endif
 
 #ifdef DATAIMAGE_MICROCHIP_TOUCH_IC
@@ -65,14 +289,17 @@ static bool touch_active = false;
 static uint32_t touch_start_time = 0;
 #endif
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-extern I2C_HandleTypeDef hi2c2;
-using namespace touchgfx;
-#ifdef DEU5_2_1R
-extern uint8_t haptic_feedback;
-#endif
-uint8_t touch_happened = 0;
 
+using namespace touchgfx;
+
+#ifdef DEU5_2_1R
+extern "C" volatile uint8_t haptic_feedback;
 uint32_t old = 0;
+uint8_t touch_happened = 0;
+#endif
+
+
+
 
 void STM32TouchController::init()
 {
@@ -80,6 +307,9 @@ void STM32TouchController::init()
 	{
 #ifdef st1x33i_240x240
 		BSP_TS_Init(240,240);
+#endif
+#ifdef st1x33i_360x360
+		BSP_TS_Init(360,360);
 #endif
 #ifdef st1x33i_480x480
 		BSP_TS_Init(480,480);
@@ -93,32 +323,60 @@ void STM32TouchController::init()
 
 bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
 {
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
+#if defined(DEU5_2_1R)
+	/* ===================== DragonEye2.0 (unchanged) ===================== */
 
 	static int32_t lastX = 0;
 	static int32_t lastY = 0;
 
 	if (Touch_Event_Flag == 1){
-
-		uint32_t now = HAL_GetTick();
-		if(now - old >= 10){
+			Touch_Event_Flag = 0;
 			TS_IO_ReadMultiple(I2C_Address, 0x12, cord, sizeof(cord));
 			ST1633I_TouchDtect(&ST_1633ITouchData, cord);
-			old = HAL_GetTick();
-		} else {
-			Touch_Event_Flag = 0;
-		}
 	}
 
 	if (BSP_TS_GetState(&TS_State) == TOUCH_OK){
 		if(TS_State.touchDetected){
 			if(touch_happened==0){
 				touch_happened = 1;
-#ifdef DEU5_2_1R
 				haptic_feedback = 2;
-#endif
 			}
 
+			int32_t newX = TS_State.touchX[0];
+			int32_t newY = TS_State.touchY[0];
+
+			// ---- Jitter filter (dead zone of 15 pixels) ----
+			if (std::abs(newX - lastX) < 15 && std::abs(newY - lastY) < 15)
+			{
+				newX = lastX;
+				newY = lastY;
+			}
+
+			lastX = newX;
+			lastY = newY;
+
+			x = lastX;
+			y = lastY;
+			return true;
+		}
+	}
+	if(touch_happened==1){
+		touch_happened = 0;
+	}
+#elif defined(DragonEyeH5)
+	/* ===================== 1.8" H5: tap / drag (same as the 1.3" G0 for now) ===================== */
+	static int32_t lastX = 0;
+	static int32_t lastY = 0;
+
+	if (Touch_Event_Flag == 1){
+		Touch_Event_Flag = 0;
+		TS_IO_ReadMultiple(I2C_Address, 0x12, cord, sizeof(cord));
+		ST1633I_TouchDtect(&ST_1633ITouchData, cord);
+	}
+
+	if (BSP_TS_GetState(&TS_State) == TOUCH_OK){
+
+		if(TS_State.touchDetected){
 			int32_t newX = TS_State.touchX[0];
 			int32_t newY = TS_State.touchY[0];
 #ifdef st1x33i_800x480
@@ -139,24 +397,96 @@ bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
 			if (newY > ST_1633I_MAX_HEIGHT - 1) newY = ST_1633I_MAX_HEIGHT - 1;
 #endif
 
-			// ---- Jitter filter (dead zone of 15 pixels) ----
-			if (abs(newX - lastX) < 15 && abs(newY - lastY) < 15)
-			{
-				newX = lastX;
-				newY = lastY;
+			if (!fingerDown) {
+				ui8EncoderPushed = ENC_PB_RELEASED;
+				fingerDown = true;
+				touchMoved = false;
+				x= lastX = newX;
+				y= lastY = newY;
 			}
-
-			lastX = newX;
-			lastY = newY;
-
-			x = lastX;
-			y = lastY;
+			// ---- Jitter filter (dead zone of 15 pixels) ----
+			else if (abs(newX - lastX) >= 15 || abs(newY - lastY) >= 15)
+			{
+				x= lastX =newX;
+				y= lastY =newY;
+				touchMoved = true; //Drag
+			}
+			else{
+				x = lastX;
+				y = lastY;
+			}
 			return true;
 		}
 	}
-	if(touch_happened==1){
-		touch_happened = 0;
+	/* chip says lifted */
+		if (fingerDown) {
+			fingerDown = false;
+			if (!touchMoved) {
+				ui8EncoderPushed = ENC_PB_PUSHED;
+			}
+		}
+
+#elif defined(DragonEyeG0)
+	static int32_t lastX = 0;
+	static int32_t lastY = 0;
+
+	if (Touch_Event_Flag == 1){
+		Touch_Event_Flag = 0;
+		TS_IO_ReadMultiple(I2C_Address, 0x12, cord, sizeof(cord));
+		ST1633I_TouchDtect(&ST_1633ITouchData, cord);
 	}
+
+	if (BSP_TS_GetState(&TS_State) == TOUCH_OK){
+
+		if(TS_State.touchDetected){
+			int32_t newX = TS_State.touchX[0];
+			int32_t newY = TS_State.touchY[0];
+#ifdef st1x33i_800x480
+			/* 5" panel: if touches come out rotated or mirrored, define TS_SWAP_XY,
+			 * TS_MIRROR_X and/or TS_MIRROR_Y in bsp.h */
+#ifdef TS_SWAP_XY
+			{ int32_t t = newX; newX = newY; newY = t; }
+#endif
+#ifdef TS_MIRROR_X
+			newX = (ST_1633I_MAX_WIDTH - 1) - newX;
+#endif
+#ifdef TS_MIRROR_Y
+			newY = (ST_1633I_MAX_HEIGHT - 1) - newY;
+#endif
+			if (newX < 0) newX = 0;
+			if (newY < 0) newY = 0;
+			if (newX > ST_1633I_MAX_WIDTH - 1)  newX = ST_1633I_MAX_WIDTH - 1;
+			if (newY > ST_1633I_MAX_HEIGHT - 1) newY = ST_1633I_MAX_HEIGHT - 1;
+#endif
+
+			if (!fingerDown) {
+				ui8EncoderPushed = ENC_PB_RELEASED;
+				fingerDown = true;
+				touchMoved = false;
+				x= lastX = newX;
+				y= lastY = newY;
+			}
+			// ---- Jitter filter (dead zone of 15 pixels) ----
+			else if (abs(newX - lastX) >= 15 || abs(newY - lastY) >= 15)
+			{
+				x= lastX =newX;
+				y= lastY =newY;
+				touchMoved = true; //Drag
+			}
+			else{
+				x = lastX;
+				y = lastY;
+			}
+			return true;
+		}
+	}
+	/* chip says lifted */
+		if (fingerDown) {
+			fingerDown = false;
+			if (!touchMoved) {
+				ui8EncoderPushed = ENC_PB_PUSHED;
+			}
+		}
 #endif
 #ifdef DATAIMAGE_MICROCHIP_TOUCH_IC
 
@@ -191,31 +521,46 @@ bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
     return false;
 }
 
-#if defined(st1x33i_240x240) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
 
+
+#if defined(st1x33i_240x240) || defined(st1x33i_360x360) || defined(st1x33i_480x480) || defined(st1x33i_800x480)
+
+#ifdef DragonEyeH5
 void TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value) {
-	HAL_I2C_Mem_Write(&hi2c2, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, &Value, 1, 10000);
+	TS_SOFT_MemWrite(Addr, Reg, &Value, 1);                    // 1.8" H5: bit-banged I2C
 }
 
 uint8_t  TS_IO_Read(uint8_t Addr, uint8_t Reg) {
 	uint8_t Value = 0;
-	HAL_I2C_Mem_Read(&hi2c2, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, &Value, 1, 10000);
+	TS_SOFT_MemRead(Addr, Reg, &Value, 1);
 	return Value;
 }
 
 uint16_t TS_IO_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length) {
-	return HAL_I2C_Mem_Read(&hi2c2, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, Buffer, Length, 10000);
+	return TS_SOFT_MemRead(Addr, Reg, Buffer, Length);
+}
+#else
+void TS_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value) {
+	HAL_I2C_Mem_Write(&TS_I2C_HANDLE, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, &Value, 1, 10000);
 }
 
+uint8_t  TS_IO_Read(uint8_t Addr, uint8_t Reg) {
+	uint8_t Value = 0;
+	HAL_I2C_Mem_Read(&TS_I2C_HANDLE, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, &Value, 1, 10000);
+	return Value;
+}
+
+uint16_t TS_IO_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length) {
+	return HAL_I2C_Mem_Read(&TS_I2C_HANDLE, Addr, (uint16_t) Reg, I2C_MEMADD_SIZE_8BIT, Buffer, Length, 10000);
+}
+#endif
+
+/* All products: valid taken from every report (1 = finger on the glass, 0 = lifted) */
 void ST1633I_TouchDtect (touch_data_t * tdata , uint8_t *cordi)
 {
 
 	tdata->xyz_data[0].xy_h = cordi[0];
-	if(tdata->xyz_data[0].ValidFlage == 0)
-	{
-		tdata->xyz_data[0].ValidFlage = tdata->xyz_data[0].xyh_bit.valid;
-
-	}
+	tdata->xyz_data[0].ValidFlage = tdata->xyz_data[0].xyh_bit.valid;
 		if(tdata->xyz_data[0].xyh_bit.valid)
 		{
 
@@ -245,7 +590,7 @@ void ST1633I_TouchDtect (touch_data_t * tdata , uint8_t *cordi)
 uint8_t BSP_TS_Init(uint16_t ts_SizeX, uint16_t ts_SizeY)
 {
 	uint8_t ts_status = TOUCH_OK;
-#ifdef st1x33i_240x240
+#if	defined(st1x33i_240x240) || defined(st1x33i_360x360)
 	HAL_GPIO_WritePin(CTP_RST_GPIO_Port, CTP_RST_Pin, GPIO_PIN_RESET);
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(CTP_RST_GPIO_Port, CTP_RST_Pin, GPIO_PIN_SET);
@@ -260,19 +605,16 @@ uint8_t BSP_TS_Init(uint16_t ts_SizeX, uint16_t ts_SizeY)
   * @param  TS_State: Pointer to touch screen current state structure
   * @retval TOUCH_OK if all initializations are OK. Other value if error.
   */
+/* All products: keeps ValidFlage until the chip reports a lift */
 uint8_t BSP_TS_GetState(TS_StateTypeDef *TS_State)
 {
 	uint8_t ts_status = TOUCH_OK;
 
 	if(ST_1633ITouchData.xyz_data[0].ValidFlage)
 	{
-		TS_State->touchDetected = ST_1633ITouchData.xyz_data[0].ValidFlage+ST_1633ITouchData.xyz_data[1].ValidFlage+ST_1633ITouchData.xyz_data[2].ValidFlage+ST_1633ITouchData.xyz_data[3].ValidFlage;
+		TS_State->touchDetected = ST_1633ITouchData.xyz_data[0].ValidFlage;
 		TS_State->touchX[0] = ST_1633ITouchData.xyz_data[0].x;
 		TS_State->touchY[0] = ST_1633ITouchData.xyz_data[0].y;
-		ST_1633ITouchData.xyz_data[0].ValidFlage = 0;
-		ST_1633ITouchData.xyz_data[1].ValidFlage = 0;
-		ST_1633ITouchData.xyz_data[2].ValidFlage = 0;
-		ST_1633ITouchData.xyz_data[3].ValidFlage = 0;
 	}
 	else
 	{
@@ -287,16 +629,7 @@ uint8_t BSP_TS_ResetTouchData(TS_StateTypeDef *TS_State)
 
 	ST_1633ITouchData.xyz_data[0].x = 0;
 	ST_1633ITouchData.xyz_data[0].y = 0;
-	ST_1633ITouchData.xyz_data[1].x = 0;
-	ST_1633ITouchData.xyz_data[1].y = 0;
-	ST_1633ITouchData.xyz_data[2].x = 0;
-	ST_1633ITouchData.xyz_data[2].y = 0;
-	ST_1633ITouchData.xyz_data[3].x = 0;
-	ST_1633ITouchData.xyz_data[3].y = 0;
 	ST_1633ITouchData.xyz_data[0].ValidFlage = 0 ;
-	ST_1633ITouchData.xyz_data[1].ValidFlage = 0 ;
-	ST_1633ITouchData.xyz_data[2].ValidFlage = 0 ;
-	ST_1633ITouchData.xyz_data[3].ValidFlage = 0 ;
 	for(uint8_t coc=0;coc<sizeof(cord);coc++)
 	{
 		cord[coc]=0;
@@ -304,6 +637,7 @@ uint8_t BSP_TS_ResetTouchData(TS_StateTypeDef *TS_State)
 	return TOUCH_OK;
 }
 #endif
+
 
 
 
